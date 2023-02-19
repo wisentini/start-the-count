@@ -1,0 +1,33 @@
+services:
+  start-the-count-database:
+    container_name: start_the_count_database
+    build:
+      context: .
+      dockerfile: Dockerfile.database
+    image: start-the-count-database
+    environment:
+      POSTGRES_USER: 'postgres'
+      POSTGRES_PASSWORD: 'postgres'
+      POSTGRES_DATABASE: 'start_the_count'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./.docker/start-the-count-database:/var/lib/postgresql/data
+    networks:
+      - start-the-count-network
+
+  start-the-count-cache:
+    container_name: start_the_count_cache
+    image: redis:7
+    command: redis-server
+    ports:
+      - 6379:6379
+    volumes:
+      - ./.docker/start-the-count-cache:/data
+    networks:
+      - start-the-count-network
+
+networks:
+  start-the-count-network:
+    name: start_the_count_network
+    driver: bridge

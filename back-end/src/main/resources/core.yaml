@@ -1,0 +1,6 @@
+urls:
+  verificacaoAssinatura: https://qrcodenobu.tse.jus.br/tse.qrcodebu
+  dadosComplementares: https://qrcodenobu.tse.jus.br/json-bu
+redis:
+  host: localhost
+  port: 6379
