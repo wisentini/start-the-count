@@ -103,7 +103,11 @@ public class UsuarioController {
             .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Encontra todos os papéis de um usuário.", description = "Encontra todos os papéis de um usuário.")
+    @Operation(
+        summary = "Encontra todos os papéis de um usuário.",
+        description = "Encontra todos os papéis de um usuário.",
+        security = @SecurityRequirement(name = "bearerAuth")
+    )
     @GetMapping(value = "/{username}/papeis")
     @ResponseStatus(value = HttpStatus.OK)
     public List<Papel> findPapeis(
