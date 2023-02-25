@@ -50,7 +50,7 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<PapelUsuario> tipos;
+    private Set<PapelUsuario> papeis;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
@@ -64,7 +64,7 @@ public class Usuario implements UserDetails {
     private Boolean habilitado;
 
     public Usuario() {
-        this.tipos = new LinkedHashSet<>();
+        this.papeis = new LinkedHashSet<>();
         this.boletinsUrna = new LinkedHashSet<>();
     }
 
@@ -76,14 +76,14 @@ public class Usuario implements UserDetails {
         this.sobrenome = sobrenome;
     }
 
-    public Set<String> getNomesTipos() {
-        Set<String> nomesTipos = new LinkedHashSet<>();
+    public Set<String> getNomesPapeis() {
+        Set<String> nomesPapeis = new LinkedHashSet<>();
 
-        for (PapelUsuario tipo : this.tipos) {
-            nomesTipos.add(tipo.getPapel().getNome());
+        for (PapelUsuario papelUsuario : this.papeis) {
+            nomesPapeis.add(papelUsuario.getPapel().getNome());
         }
 
-        return nomesTipos;
+        return nomesPapeis;
     }
 
     public void update(Usuario usuario) {
@@ -116,8 +116,8 @@ public class Usuario implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<SimpleGrantedAuthority> authorities = new LinkedHashSet<>();
 
-        for (PapelUsuario tipo : this.tipos) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_".concat(tipo.getPapel().getNome())));
+        for (PapelUsuario papelUsuario : this.papeis) {
+            authorities.add(new SimpleGrantedAuthority("ROLE_".concat(papelUsuario.getPapel().getNome())));
         }
 
         return authorities;

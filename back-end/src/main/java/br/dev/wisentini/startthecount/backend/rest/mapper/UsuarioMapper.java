@@ -44,7 +44,7 @@ public class UsuarioMapper {
             usuario.getUsername(),
             usuario.getNome(),
             usuario.getSobrenome(),
-            usuario.getNomesTipos(),
+            usuario.getNomesPapeis(),
             usuario.getCriadoEm(),
             usuario.getAtualizadoEm()
         );
