@@ -10,7 +10,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
-public class ComplementoBoletimUrnaCacheService extends CacheService<BoletimUrna> {
+public class ComplementoBoletimUrnaCachingService extends CachingService<BoletimUrna> {
 
     private static final Gson gson = new GsonBuilder().create();
 

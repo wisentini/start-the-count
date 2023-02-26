@@ -7,7 +7,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 
-public class ChavePublicaVerificacaoAssinaturaCacheService extends CacheService<byte[]> {
+public class ChavePublicaVerificacaoAssinaturaCachingService extends CachingService<byte[]> {
 
     public byte[] get(String url) {
         try {

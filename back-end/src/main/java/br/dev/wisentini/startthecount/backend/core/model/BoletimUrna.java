@@ -2,8 +2,8 @@ package br.dev.wisentini.startthecount.backend.core.model;
 
 import br.dev.wisentini.startthecount.backend.core.config.ConfigurationLoader;
 import br.dev.wisentini.startthecount.backend.core.exception.*;
-import br.dev.wisentini.startthecount.backend.core.service.ChavePublicaVerificacaoAssinaturaCacheService;
-import br.dev.wisentini.startthecount.backend.core.service.ComplementoBoletimUrnaCacheService;
+import br.dev.wisentini.startthecount.backend.core.service.ChavePublicaVerificacaoAssinaturaCachingService;
+import br.dev.wisentini.startthecount.backend.core.service.ComplementoBoletimUrnaCachingService;
 import br.dev.wisentini.startthecount.backend.core.util.Security;
 
 import lombok.AccessLevel;
@@ -27,15 +27,15 @@ public class BoletimUrna {
     private String assinatura;
 
     @Getter(value = AccessLevel.NONE)
-    private final ChavePublicaVerificacaoAssinaturaCacheService chavePublicaVerificacaoAssinaturaCacheService;
+    private final ChavePublicaVerificacaoAssinaturaCachingService chavePublicaVerificacaoAssinaturaCacheService;
 
     @Getter(value = AccessLevel.NONE)
-    private final ComplementoBoletimUrnaCacheService complementoBoletimUrnaCacheService;
+    private final ComplementoBoletimUrnaCachingService complementoBoletimUrnaCacheService;
 
     public BoletimUrna() {
         this.qrCodes = new LinkedList<>();
-        this.chavePublicaVerificacaoAssinaturaCacheService = new ChavePublicaVerificacaoAssinaturaCacheService();
-        this.complementoBoletimUrnaCacheService = new ComplementoBoletimUrnaCacheService();
+        this.chavePublicaVerificacaoAssinaturaCacheService = new ChavePublicaVerificacaoAssinaturaCachingService();
+        this.complementoBoletimUrnaCacheService = new ComplementoBoletimUrnaCachingService();
     }
 
     public void addQRCode(QRCodeBoletimUrna qrCode) {
