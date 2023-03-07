@@ -1,8 +1,6 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,6 +17,5 @@ public class SecaoRetrievalDTO {
 
     private Integer numeroTSE;
 
-    @JsonProperty(value = "zona")
-    private ZonaRetrievalDTO zonaRetrievalDTO;
+    private ZonaRetrievalDTO zona;
 }

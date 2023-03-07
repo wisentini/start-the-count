@@ -84,7 +84,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(value = EntidadeJaExisteException.class)
     @ResponseStatus(value = HttpStatus.CONFLICT)
-    public ResponseEntity<Object> handleEntityAlreadyExistsException(
+    public ResponseEntity<Object> handleEntidadeJaExisteException(
         EntidadeJaExisteException entidadeJaExisteException
     ) {
         return this.handleError(
@@ -95,7 +95,7 @@ public class ErrorHandler {
 
     @ExceptionHandler(value = EntidadeNaoEncontradaException.class)
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
-    public ResponseEntity<Object> handleEntityNotFoundException(
+    public ResponseEntity<Object> handleEntidadeNaoEncontradaException(
         EntidadeNaoEncontradaException entidadeNaoEncontradaException
     ) {
         return this.handleError(

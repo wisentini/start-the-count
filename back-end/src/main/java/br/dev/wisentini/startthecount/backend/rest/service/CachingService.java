@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Service
@@ -13,9 +14,11 @@ public class CachingService {
 
     private final CacheManager cacheManager;
 
+    public void evictCaches(Collection<String> cacheNames) {
+        cacheNames.forEach(cacheName -> Objects.requireNonNull(this.cacheManager.getCache(cacheName)).clear());
+    }
+
     public void evictAllCaches() {
-        this.cacheManager
-            .getCacheNames()
-            .forEach(cacheName -> Objects.requireNonNull(this.cacheManager.getCache(cacheName)).clear());
+        this.evictCaches(this.cacheManager.getCacheNames());
     }
 }

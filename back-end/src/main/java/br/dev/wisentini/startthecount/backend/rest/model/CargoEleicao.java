@@ -13,7 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity(name = "CargoEleicao")
-@Table(name = "cargo_eleicao", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_cargo", "id_eleicao"})})
+@Table(
+    name = "cargo_eleicao",
+    schema = "public",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"id_cargo", "id_eleicao"})})
 @Getter
 @Setter
 @ToString(doNotUseGetters = true)
@@ -40,17 +43,17 @@ public class CargoEleicao implements Serializable {
     @OneToMany(mappedBy = "cargoEleicao", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosCargoBoletimUrna> apuracoesVotosBoletinsUrna;
+    private Set<ApuracaoVotosCargoBoletimUrna> apuracoesVotosCargosBoletimUrna;
 
     @OneToMany(mappedBy = "cargoEleicao", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosPartidoBoletimUrna> apuracoesVotosPartidos;
+    private Set<ApuracaoVotosPartidoBoletimUrna> apuracoesVotosPartidosBoletimUrna;
 
     public CargoEleicao() {
         this.candidaturas = new LinkedHashSet<>();
-        this.apuracoesVotosBoletinsUrna = new LinkedHashSet<>();
-        this.apuracoesVotosPartidos = new LinkedHashSet<>();
+        this.apuracoesVotosCargosBoletimUrna = new LinkedHashSet<>();
+        this.apuracoesVotosPartidosBoletimUrna = new LinkedHashSet<>();
     }
 
     public CargoEleicao(Cargo cargo, Eleicao eleicao) {

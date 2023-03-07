@@ -13,18 +13,32 @@ public class BoletimUrnaMapper {
 
     private final SecaoPleitoMapper secaoPleitoMapper;
 
+    private final FaseMapper faseMapper;
+
+    private final OrigemBoletimUrnaMapper origemBoletimUrnaMapper;
+
+    private final UrnaEletronicaMapper urnaEletronicaMapper;
+
     @Autowired
-    public BoletimUrnaMapper(@Lazy SecaoPleitoMapper secaoPleitoMapper) {
+    public BoletimUrnaMapper(
+        @Lazy SecaoPleitoMapper secaoPleitoMapper,
+        FaseMapper faseMapper,
+        OrigemBoletimUrnaMapper origemBoletimUrnaMapper,
+        UrnaEletronicaMapper urnaEletronicaMapper
+    ) {
         this.secaoPleitoMapper = secaoPleitoMapper;
+        this.faseMapper = faseMapper;
+        this.origemBoletimUrnaMapper = origemBoletimUrnaMapper;
+        this.urnaEletronicaMapper = urnaEletronicaMapper;
     }
 
     public BoletimUrnaRetrievalDTO toBoletimUrnaRetrievalDTO(BoletimUrna boletimUrna) {
         return new BoletimUrnaRetrievalDTO(
             boletimUrna.getId(),
             this.secaoPleitoMapper.toSecaoPleitoRetrievalDTO(boletimUrna.getSecaoPleito()),
-            boletimUrna.getFase(),
-            boletimUrna.getOrigem(),
-            boletimUrna.getUrnaEletronica(),
+            this.faseMapper.toFaseRetrievalDTO(boletimUrna.getFase()),
+            this.origemBoletimUrnaMapper.toOrigemBoletimUrnaRetrievalDTO(boletimUrna.getOrigem()),
+            this.urnaEletronicaMapper.toUrnaEletronicaRetrievalDTO(boletimUrna.getUrnaEletronica()),
             boletimUrna.getAssinatura(),
             boletimUrna.getQuantidadeTotalQRCodes(),
             boletimUrna.getDataEmissao(),

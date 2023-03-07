@@ -4,17 +4,22 @@ import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoPleitoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
 import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoPleitoMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.Pleito;
-import br.dev.wisentini.startthecount.backend.rest.model.Secao;
+import br.dev.wisentini.startthecount.backend.rest.model.BoletimUrna;
 import br.dev.wisentini.startthecount.backend.rest.model.SecaoPleito;
 import br.dev.wisentini.startthecount.backend.rest.repository.SecaoPleitoRepository;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "secao-pleito")
 public class SecaoPleitoService {
 
     private final SecaoPleitoRepository secaoPleitoRepository;
@@ -23,6 +28,9 @@ public class SecaoPleitoService {
 
     private final BoletimUrnaService boletimUrnaService;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%s:%d', #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
     public SecaoPleito findById(SecaoPleitoIdDTO id) {
         return this.secaoPleitoRepository
             .findBySecaoNumeroTSEAndSecaoZonaNumeroTSEAndSecaoZonaUfSiglaEqualsIgnoreCaseAndPleitoCodigoTSE(
@@ -32,24 +40,18 @@ public class SecaoPleitoService {
                 id.getCodigoTSEPleito()
             )
             .orElseThrow(() -> {
-                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de SecaoPleito identificada por %s.", id));
+                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre seção e pleito identificada por %s.", id));
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<SecaoPleito> findAll() {
         return this.secaoPleitoRepository.findAll();
     }
 
-    public List<Secao> findSecoesByPleito(Integer codigoTSEPleito) {
-        return this.secaoPleitoRepository.findSecoesByPleito(codigoTSEPleito);
-    }
-
-    public List<Pleito> findPleitosBySecao(SecaoIdDTO id) {
-        return this.secaoPleitoRepository.findPleitosBySecao(
-            id.getNumeroTSESecao(),
-            id.getNumeroTSEZona(),
-            id.getSiglaUF()
-        );
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<BoletimUrna> findBoletinsUrna(SecaoPleitoIdDTO id) {
+        return this.findById(id).getBoletinsUrna();
     }
 
     public SecaoPleito getIfExistsOrElseSave(SecaoPleito secaoPleito) {
@@ -61,6 +63,8 @@ public class SecaoPleitoService {
         )) {
             return this.findById(this.secaoPleitoMapper.toSecaoPleitoIdDTO(secaoPleito));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.secaoPleitoRepository.save(secaoPleito);
     }
@@ -74,7 +78,7 @@ public class SecaoPleitoService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         )) {
-            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de SecaoPleito identificada por %s.", id));
+            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre seção e pleito identificada por %s.", id));
         }
 
         this.boletimUrnaService.deleteBySecaoPleito(id);
@@ -85,6 +89,8 @@ public class SecaoPleitoService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteBySecao(SecaoIdDTO secaoId) {
@@ -104,6 +110,8 @@ public class SecaoPleitoService {
             secaoId.getNumeroTSEZona(),
             secaoId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByPleito(int codigoTSEPleito) {
@@ -114,5 +122,7 @@ public class SecaoPleitoService {
             ));
 
         this.secaoPleitoRepository.deleteByPleitoCodigoTSE(codigoTSEPleito);
+
+        this.cachingService.evictAllCaches();
     }
 }

@@ -43,10 +43,10 @@ public class Candidatura implements Serializable {
     @OneToMany(mappedBy = "candidatura", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosCandidaturaBoletimUrna> apuracoesVotosBoletinsUrna;
+    private Set<ApuracaoVotosCandidaturaBoletimUrna> apuracoesVotosBoletimUrna;
 
     public Candidatura() {
-        this.apuracoesVotosBoletinsUrna = new LinkedHashSet<>();
+        this.apuracoesVotosBoletimUrna = new LinkedHashSet<>();
     }
 
     public Candidatura(Candidato candidato, CargoEleicao cargoEleicao, Partido partido) {

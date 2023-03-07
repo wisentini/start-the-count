@@ -12,11 +12,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CargoEleicaoMapper {
 
+    private final CargoMapper cargoMapper;
+
+    private final EleicaoMapper eleicaoMapper;
+
     public CargoEleicaoRetrievalDTO toCargoEleicaoRetrievalDTO(CargoEleicao cargoEleicao) {
         return new CargoEleicaoRetrievalDTO(
             cargoEleicao.getId(),
-            cargoEleicao.getCargo(),
-            cargoEleicao.getEleicao()
+            this.cargoMapper.toCargoRetrievalDTO(cargoEleicao.getCargo()),
+            this.eleicaoMapper.toEleicaoRetrievalDTO(cargoEleicao.getEleicao())
         );
     }
 

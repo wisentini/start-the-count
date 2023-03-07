@@ -11,11 +11,15 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class PapelPermissaoMapper {
 
+    private final PapelMapper papelMapper;
+
+    private final PermissaoMapper permissaoMapper;
+
     public PapelPermissaoRetrievalDTO toPapelPermissaoRetrievalDTO(PapelPermissao papelPermissao) {
         return new PapelPermissaoRetrievalDTO(
             papelPermissao.getId(),
-            papelPermissao.getPapel(),
-            papelPermissao.getPermissao()
+            this.papelMapper.toPapelRetrievalDTO(papelPermissao.getPapel()),
+            this.permissaoMapper.toPermissaoRetrievalDTO(papelPermissao.getPermissao())
         );
     }
 }

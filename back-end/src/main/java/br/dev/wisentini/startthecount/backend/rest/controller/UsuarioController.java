@@ -4,22 +4,16 @@ import br.dev.wisentini.startthecount.backend.rest.config.JwtService;
 import br.dev.wisentini.startthecount.backend.rest.dto.creation.UsuarioCreationDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.request.AuthenticationRequestDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.response.ApiEmptyResponse;
-import br.dev.wisentini.startthecount.backend.rest.dto.response.AuthenticationResponseDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.response.ApiResponse;
 import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.BoletimUrnaRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.PapelRetrievalDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.UsuarioRetrievalDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.update.UsuarioUpdateDTO;
 import br.dev.wisentini.startthecount.backend.rest.mapper.BoletimUrnaMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.PapelMapper;
 import br.dev.wisentini.startthecount.backend.rest.mapper.UsuarioMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.Papel;
 import br.dev.wisentini.startthecount.backend.rest.model.Usuario;
-import br.dev.wisentini.startthecount.backend.rest.service.BoletimUrnaUsuarioService;
-import br.dev.wisentini.startthecount.backend.rest.service.PapelUsuarioService;
 import br.dev.wisentini.startthecount.backend.rest.service.UsuarioService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
@@ -32,142 +26,92 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/usuarios")
+@RequestMapping(value = "/api/usuarios")
 @RequiredArgsConstructor
-@Tag(name = "usuarios")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
     private final UsuarioMapper usuarioMapper;
 
-    private final BoletimUrnaUsuarioService boletimUrnaUsuarioService;
-
-    private final PapelUsuarioService papelUsuarioService;
-
     private final BoletimUrnaMapper boletimUrnaMapper;
+
+    private final PapelMapper papelMapper;
 
     private final JwtService jwtService;
 
     private final AuthenticationManager authenticationManager;
 
-    @Operation(
-        summary = "Encontra um usuário pelo username.",
-        description = "Encontra um usuário pelo username.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @GetMapping(value = "/{username}")
     @ResponseStatus(value = HttpStatus.OK)
-    public UsuarioRetrievalDTO findUsuario(
-        @Parameter(description = "O username do usuário que deve ser encontrado.")
-        @PathVariable("username") String username
-    ) {
+    public UsuarioRetrievalDTO findUsuario(@PathVariable("username") String username) {
         return this.usuarioMapper.toUsuarioRetrievalDTO(this.usuarioService.findByUsername(username));
     }
 
-    @Operation(
-        summary = "Encontra todos os usuários.",
-        description = "Encontra todos os usuários.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<UsuarioRetrievalDTO> findUsuarios() {
+    public Set<UsuarioRetrievalDTO> findUsuarios() {
         return this.usuarioService
             .findAll()
             .stream()
             .map(this.usuarioMapper::toUsuarioRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 
-    @Operation(
-        summary = "Encontra todos os boletins de urna coletados por um usuário.",
-        description = "Encontra todos os boletins de urna coletados por um usuário.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @GetMapping(value = "/{username}/boletins-urna")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<BoletimUrnaRetrievalDTO> findBoletinsUrna(
-        @Parameter(description = "O username do usuário.")
-        @PathVariable("username") String username
-    ) {
-        return this.boletimUrnaUsuarioService
-            .findBoletinsUrnaByUsuario(username)
+    public Set<BoletimUrnaRetrievalDTO> findBoletinsUrna(@PathVariable("username") String username) {
+        return this.usuarioService
+            .findBoletinsUrna(username)
             .stream()
             .map(this.boletimUrnaMapper::toBoletimUrnaRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
     }
 
-    @Operation(
-        summary = "Encontra todos os papéis de um usuário.",
-        description = "Encontra todos os papéis de um usuário.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @GetMapping(value = "/{username}/papeis")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Papel> findPapeis(
-        @Parameter(description = "O username.")
-        @PathVariable("username") String username
-    ) {
-        return this.papelUsuarioService.findPapeisByUsuario(username);
+    public Set<PapelRetrievalDTO> findPapeis(@PathVariable("username") String username) {
+        return this.usuarioService
+            .findPapeis(username)
+            .stream()
+            .map(this.papelMapper::toPapelRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 
-    @Operation(
-        summary = "Atualiza um usuário pelo username.",
-        description = "Atualiza um usuário pelo username.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @PatchMapping(value = "/{username}")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void updateUsuario(
-        @Parameter(description = "O username do usuário que deve ser atualizado.")
-        @PathVariable("username")
-        String username,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Os novos dados do usuário.")
-        @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO) {
+    public void update(
+        @PathVariable("username") String username,
+        @Valid @RequestBody UsuarioUpdateDTO usuarioUpdateDTO
+    ) {
         this.usuarioService.updateByUsername(username, usuarioUpdateDTO);
     }
 
-    @Operation(summary = "Cria um usuário.", description = "Cria um usuário.")
     @PostMapping(value = "/create")
     @ResponseStatus(value = HttpStatus.CREATED)
-    public AuthenticationResponseDTO createUsuario(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Os dados do novo usuário.")
-        @Valid @RequestBody UsuarioCreationDTO usuarioCreationDTO
-    ) {
-        return new AuthenticationResponseDTO(
+    public ApiResponse<String> create(@Valid @RequestBody UsuarioCreationDTO usuarioCreationDTO) {
+        return new ApiResponse<>(
             this.jwtService.generateToken(
                 this.usuarioService.save(usuarioCreationDTO)
-            )
+            ),
+                HttpStatus.CREATED
         );
     }
 
-    @Operation(
-        summary = "Remove um usuário.",
-        description = "Remove um usuário.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @DeleteMapping(value = "/{username}")
     @ResponseStatus(value = HttpStatus.ACCEPTED)
-    public void deleteUsuario(
-        @Parameter(description = "O username do usuário que deve ser removido.")
-        @PathVariable("username") String username
-    ) {
+    public void delete(@PathVariable("username") String username) {
         this.usuarioService.deleteByUsername(username);
     }
 
-    @Operation(summary = "Autentica um usuário.", description = "Autentica um usuário.")
     @PostMapping(value = "/login")
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public AuthenticationResponseDTO login(
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Os dados de autenticação do usuário.")
-        @Valid @RequestBody AuthenticationRequestDTO authenticationRequestDTO
-    ) {
+    @ResponseStatus(value = HttpStatus.OK)
+    public ApiResponse<String> login(@Valid @RequestBody AuthenticationRequestDTO authenticationRequestDTO) {
         this.authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 authenticationRequestDTO.getUsername(),
@@ -175,18 +119,14 @@ public class UsuarioController {
             )
         );
 
-        return new AuthenticationResponseDTO(
+        return new ApiResponse<>(
             this.jwtService.generateToken(
                 this.usuarioService.findByUsername(authenticationRequestDTO.getUsername())
-            )
+            ),
+            HttpStatus.OK
         );
     }
 
-    @Operation(
-        summary = "Retorna o usuário atual.",
-        description = "Retorna o usuário atual.",
-        security = @SecurityRequirement(name = "bearerAuth")
-    )
     @GetMapping(value = "/current")
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<Object> current(@AuthenticationPrincipal Usuario usuario) {

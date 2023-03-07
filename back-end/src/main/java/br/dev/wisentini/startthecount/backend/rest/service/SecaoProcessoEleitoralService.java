@@ -5,25 +5,29 @@ import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoProcessoEleitoralIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
 import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoProcessoEleitoralMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.ProcessoEleitoral;
-import br.dev.wisentini.startthecount.backend.rest.model.Secao;
 import br.dev.wisentini.startthecount.backend.rest.model.SecaoProcessoEleitoral;
 import br.dev.wisentini.startthecount.backend.rest.repository.SecaoProcessoEleitoralRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "secao-processo-eleitoral")
 public class SecaoProcessoEleitoralService {
 
     private final SecaoProcessoEleitoralRepository secaoProcessoEleitoralRepository;
 
     private final SecaoProcessoEleitoralMapper secaoProcessoEleitoralMapper;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%s:%d', #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEProcessoEleitoral)")
     public SecaoProcessoEleitoral findById(SecaoProcessoEleitoralIdDTO id) {
         return this.secaoProcessoEleitoralRepository
             .findBySecaoNumeroTSEAndSecaoZonaNumeroTSEAndSecaoZonaUfSiglaEqualsIgnoreCaseAndProcessoEleitoralCodigoTSE(
@@ -33,24 +37,13 @@ public class SecaoProcessoEleitoralService {
                 id.getCodigoTSEProcessoEleitoral()
             )
             .orElseThrow(() -> {
-                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de SecaoProcessoEleitoral identificada por %s.", id));
+                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre seção e processo eleitoral identificada por %s.", id));
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<SecaoProcessoEleitoral> findAll() {
         return this.secaoProcessoEleitoralRepository.findAll();
-    }
-
-    public List<Secao> findSecoesByProcessoEleitoral(Integer codigoTSEProcessoEleitoral) {
-        return this.secaoProcessoEleitoralRepository.findSecoesByProcessoEleitoral(codigoTSEProcessoEleitoral);
-    }
-
-    public List<ProcessoEleitoral> findProcessosEleitoraisBySecao(SecaoIdDTO id) {
-        return this.secaoProcessoEleitoralRepository.findProcessosEleitoraisBySecao(
-            id.getNumeroTSESecao(),
-            id.getNumeroTSEZona(),
-            id.getSiglaUF()
-        );
     }
 
     public SecaoProcessoEleitoral getIfExistsOrElseSave(SecaoProcessoEleitoral secaoProcessoEleitoral) {
@@ -62,6 +55,8 @@ public class SecaoProcessoEleitoralService {
         )) {
             return this.findById(this.secaoProcessoEleitoralMapper.toSecaoProcessoEleitoralIdDTO(secaoProcessoEleitoral));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.secaoProcessoEleitoralRepository.save(secaoProcessoEleitoral);
     }
@@ -75,7 +70,7 @@ public class SecaoProcessoEleitoralService {
             id.getSiglaUF(),
             id.getCodigoTSEProcessoEleitoral()
         )) {
-            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de SecaoProcessoEleitoral identificada por %s.", id));
+            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre seção e processo eleitoral identificada por %s.", id));
         }
 
         this.secaoProcessoEleitoralRepository.deleteBySecaoNumeroTSEAndSecaoZonaNumeroTSEAndSecaoZonaUfSiglaEqualsIgnoreCaseAndProcessoEleitoralCodigoTSE(
@@ -84,6 +79,8 @@ public class SecaoProcessoEleitoralService {
             id.getSiglaUF(),
             id.getCodigoTSEProcessoEleitoral()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteBySecao(SecaoIdDTO secaoId) {
@@ -94,10 +91,14 @@ public class SecaoProcessoEleitoralService {
             secaoId.getNumeroTSEZona(),
             secaoId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByProcessoEleitoral(int codigoTSEProcessoEleitoral) {
         this.secaoProcessoEleitoralRepository.deleteByProcessoEleitoralCodigoTSE(codigoTSEProcessoEleitoral);
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByLocalVotacao(LocalVotacaoIdDTO localVotacaoId) {
@@ -108,5 +109,7 @@ public class SecaoProcessoEleitoralService {
             localVotacaoId.getNumeroTSEZona(),
             localVotacaoId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 }

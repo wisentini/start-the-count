@@ -1,7 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.UF;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -20,9 +18,9 @@ public class ZonaRetrievalDTO {
 
     private Integer numeroTSE;
 
-    private UF uf;
+    private UFRetrievalDTO uf;
 
-    public UF getUF() {
+    public UFRetrievalDTO getUF() {
         return this.uf;
     }
 }

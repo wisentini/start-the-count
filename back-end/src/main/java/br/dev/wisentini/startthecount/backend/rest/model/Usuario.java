@@ -47,7 +47,7 @@ public class Usuario implements UserDetails {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss")
     private LocalDateTime atualizadoEm;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH, orphanRemoval = true)
+    @OneToMany(mappedBy = "usuario", fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JsonIgnore
     @ToString.Exclude
     private Set<PapelUsuario> papeis;

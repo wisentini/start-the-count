@@ -12,11 +12,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ZonaMapper {
 
+    private final UFMapper ufMapper;
+
     public ZonaRetrievalDTO toZonaRetrievalDTO(Zona zona) {
         return new ZonaRetrievalDTO(
             zona.getId(),
             zona.getNumeroTSE(),
-            zona.getUF()
+            this.ufMapper.toUFRetrievalDTO(zona.getUF())
         );
     }
 

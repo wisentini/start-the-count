@@ -1,9 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.Candidato;
-import br.dev.wisentini.startthecount.backend.rest.model.Partido;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -20,10 +16,9 @@ public class CandidaturaRetrievalDTO {
 
     private Integer id;
 
-    private Candidato candidato;
+    private CandidatoRetrievalDTO candidato;
 
-    @JsonProperty(value = "cargoEleicao")
-    private CargoEleicaoRetrievalDTO cargoEleicaoRetrievalDTO;
+    private CargoEleicaoRetrievalDTO cargoEleicao;
 
-    private Partido partido;
+    private PartidoRetrievalDTO partido;
 }

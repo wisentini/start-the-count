@@ -1,11 +1,6 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.Fase;
-import br.dev.wisentini.startthecount.backend.rest.model.OrigemBoletimUrna;
-import br.dev.wisentini.startthecount.backend.rest.model.UrnaEletronica;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -20,19 +15,21 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder(value = {"id", "secaoPleito", "origem", "urnaEletronica", "assinatura", "quantidadeTotalQRCodes", "dataEmissao", "horarioEmissao"})
+@JsonPropertyOrder(value = {
+    "id", "secaoPleito", "origem", "urnaEletronica", "assinatura",
+    "quantidadeTotalQRCodes", "dataEmissao", "horarioEmissao"
+})
 public class BoletimUrnaRetrievalDTO {
 
     private Integer id;
 
-    @JsonProperty(value = "secaoPleito")
-    private SecaoPleitoRetrievalDTO secaoPleitoRetrievalDTO;
+    private SecaoPleitoRetrievalDTO secaoPleito;
 
-    private Fase fase;
+    private FaseRetrievalDTO fase;
 
-    private OrigemBoletimUrna origem;
+    private OrigemBoletimUrnaRetrievalDTO origem;
 
-    private UrnaEletronica urnaEletronica;
+    private UrnaEletronicaRetrievalDTO urnaEletronica;
 
     private String assinatura;
 

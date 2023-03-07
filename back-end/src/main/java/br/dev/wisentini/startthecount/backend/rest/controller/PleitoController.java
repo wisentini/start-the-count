@@ -1,15 +1,12 @@
 package br.dev.wisentini.startthecount.backend.rest.controller;
 
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.EleicaoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.PleitoRetrievalDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.SecaoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.mapper.EleicaoMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.PleitoMapper;
 import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.Pleito;
 import br.dev.wisentini.startthecount.backend.rest.service.PleitoService;
-import br.dev.wisentini.startthecount.backend.rest.service.SecaoPleitoService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,49 +14,55 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/pleitos")
+@RequestMapping(value = "/api/pleitos")
 @RequiredArgsConstructor
-@Tag(name = "pleitos")
-@SecurityRequirement(name = "bearerAuth")
 public class PleitoController {
 
     private final PleitoService pleitoService;
 
-    private final SecaoPleitoService secaoPleitoService;
+    private final PleitoMapper pleitoMapper;
+
+    private final EleicaoMapper eleicaoMapper;
 
     private final SecaoMapper secaoMapper;
 
-    @Operation(summary = "Encontra um pleito.", description = "Encontra um pleito.")
     @GetMapping(value = "/{codigoTSE}")
     @ResponseStatus(value = HttpStatus.OK)
-    public Pleito findPleito(
-        @Parameter(description = "O código do pleito que deve ser encontrado.")
-        @PathVariable("codigoTSE") int codigoTSE
-    ) {
-        return this.pleitoService.findByCodigoTSE(codigoTSE);
+    public PleitoRetrievalDTO findPleito(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.pleitoMapper.toPleitoRetrievalDTO(this.pleitoService.findByCodigoTSE(codigoTSE));
     }
 
-    @Operation(summary = "Encontra todos os pleitos.", description = "Encontra todos os pleitos.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Pleito> findPleitos() {
-        return this.pleitoService.findAll();
+    public List<PleitoRetrievalDTO> findPleitos() {
+        return this.pleitoService
+            .findAll()
+            .stream()
+            .map(this.pleitoMapper::toPleitoRetrievalDTO)
+            .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Encontra todas as seções de um pleito.", description = "Encontra todas as seções de um pleito.")
     @GetMapping(value = "/{codigoTSE}/secoes")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<SecaoRetrievalDTO> findSecoes(
-        @Parameter(description = "O código do pleito.")
-        @PathVariable("codigoTSE") int codigoTSE
-    ) {
-        return this.secaoPleitoService
-            .findSecoesByPleito(codigoTSE)
+    public Set<SecaoRetrievalDTO> findSecoes(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.pleitoService
+            .findSecoes(codigoTSE)
             .stream()
             .map(this.secaoMapper::toSecaoRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/{codigoTSE}/eleicoes")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<EleicaoRetrievalDTO> findEleicoes(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.pleitoService
+            .findEleicoes(codigoTSE)
+            .stream()
+            .map(this.eleicaoMapper::toEleicaoRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

@@ -1,17 +1,15 @@
 package br.dev.wisentini.startthecount.backend.rest.service;
 
-import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeJaExisteException;
-import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
-import br.dev.wisentini.startthecount.backend.rest.model.PapelUsuario;
-import br.dev.wisentini.startthecount.backend.rest.repository.UsuarioRepository;
 import br.dev.wisentini.startthecount.backend.rest.dto.creation.UsuarioCreationDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.update.UsuarioUpdateDTO;
+import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeJaExisteException;
+import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
 import br.dev.wisentini.startthecount.backend.rest.mapper.UsuarioMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.Usuario;
+import br.dev.wisentini.startthecount.backend.rest.model.*;
+import br.dev.wisentini.startthecount.backend.rest.repository.UsuarioRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
@@ -21,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = "usuario")
@@ -36,19 +36,23 @@ public class UsuarioService implements UserDetailsService {
 
     private final BoletimUrnaUsuarioService boletimUrnaUsuarioService;
 
+    private final CachingService cachingService;
+
     @Autowired
     public UsuarioService(
         UsuarioRepository usuarioRepository,
         UsuarioMapper usuarioMapper,
         PapelService papelService,
         PapelUsuarioService papelUsuarioService,
-        @Lazy BoletimUrnaUsuarioService boletimUrnaUsuarioService
+        @Lazy BoletimUrnaUsuarioService boletimUrnaUsuarioService,
+        CachingService cachingService
     ) {
         this.usuarioRepository = usuarioRepository;
         this.usuarioMapper = usuarioMapper;
         this.papelService = papelService;
         this.papelUsuarioService = papelUsuarioService;
         this.boletimUrnaUsuarioService = boletimUrnaUsuarioService;
+        this.cachingService = cachingService;
     }
 
     @Cacheable(key = "#username")
@@ -63,6 +67,26 @@ public class UsuarioService implements UserDetailsService {
     @Cacheable(key = "#root.methodName")
     public List<Usuario> findAll() {
         return this.usuarioRepository.findAll();
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%s', #root.methodName, #username)")
+    public Set<Papel> findPapeis(String username) {
+        return this
+            .findByUsername(username)
+            .getPapeis()
+            .stream()
+            .map(PapelUsuario::getPapel)
+            .collect(Collectors.toSet());
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%s', #root.methodName, #username)")
+    public Set<BoletimUrna> findBoletinsUrna(String username) {
+        return this
+            .findByUsername(username)
+            .getBoletinsUrna()
+            .stream()
+            .map(BoletimUrnaUsuario::getBoletimUrna)
+            .collect(Collectors.toSet());
     }
 
     @CachePut(key = "#username")
@@ -80,7 +104,6 @@ public class UsuarioService implements UserDetailsService {
         this.usuarioRepository.save(usuario);
     }
 
-    @CacheEvict(allEntries = true)
     public Usuario save(UsuarioCreationDTO usuarioCreationDTO) {
         usuarioCreationDTO.validate();
 
@@ -90,10 +113,12 @@ public class UsuarioService implements UserDetailsService {
 
         Usuario usuario = this.usuarioRepository.save(this.usuarioMapper.toUsuario(usuarioCreationDTO));
 
-        usuarioCreationDTO.getNomesTiposUsuario().forEach(nomePapel -> this.papelUsuarioService.save(new PapelUsuario(
+        usuarioCreationDTO.getNomesPapeis().forEach(nomePapel -> this.papelUsuarioService.save(new PapelUsuario(
             usuario,
             this.papelService.findByNome(nomePapel)
         )));
+
+        this.cachingService.evictAllCaches();
 
         return usuario;
     }
@@ -108,14 +133,16 @@ public class UsuarioService implements UserDetailsService {
             });
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteByUsername(String username) {
         if (!this.usuarioRepository.existsByUsernameEqualsIgnoreCase(username)) {
             throw new EntidadeNaoEncontradaException(String.format("Não foi encontrado nenhum usuário com o username \"%s\".", username));
         }
 
         this.boletimUrnaUsuarioService.deleteByUsuario(username);
+        this.papelUsuarioService.deleteByUsuario(username);
 
         this.usuarioRepository.deleteByUsernameEqualsIgnoreCase(username);
+
+        this.cachingService.evictAllCaches();
     }
 }

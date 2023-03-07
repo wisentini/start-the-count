@@ -5805,8 +5805,8 @@ INSERT INTO usuario (username, nome, sobrenome, senha) VALUES ('admin', NULL, NU
 INSERT INTO usuario (username, nome, sobrenome, senha) VALUES ('wisentini', 'Marcos', 'Visentini', '$2a$12$jVcDh8GlAcZYjW7m/pjJ7.jHVxgW0selWjxHcutmRcelD51YGqhB.');
 
 
-INSERT INTO permissao (nome, descricao) VALUES ('LEITURA', 'Acesso para leitura.');
-INSERT INTO permissao (nome, descricao) VALUES ('ESCRITA', 'Acesso para escrita.');
+INSERT INTO permissao (nome, descricao) VALUES ('LEITURA', 'Acesso para leitura');
+INSERT INTO permissao (nome, descricao) VALUES ('ESCRITA', 'Acesso para escrita');
 
 
 INSERT INTO papel_permissao (id_papel, id_permissao) VALUES (1, 1);

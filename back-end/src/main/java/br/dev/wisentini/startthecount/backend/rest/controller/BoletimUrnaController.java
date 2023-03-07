@@ -3,22 +3,12 @@ package br.dev.wisentini.startthecount.backend.rest.controller;
 import br.dev.wisentini.startthecount.backend.rest.dto.build.BoletimUrnaBuildDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.BoletimUrnaIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.response.ApiResponse;
-import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.BoletimUrnaRetrievalDTO;
-import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.QRCodeBoletimUrnaRetrievalDTO;
-import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.UsuarioRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.*;
 import br.dev.wisentini.startthecount.backend.rest.exception.UsuarioNaoAutenticadoException;
-import br.dev.wisentini.startthecount.backend.rest.mapper.BoletimUrnaMapper;
-import br.dev.wisentini.startthecount.backend.rest.mapper.QRCodeBoletimUrnaMapper;
-import br.dev.wisentini.startthecount.backend.rest.mapper.UsuarioMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.*;
 import br.dev.wisentini.startthecount.backend.rest.model.Usuario;
 import br.dev.wisentini.startthecount.backend.rest.service.BoletimUrnaService;
 import br.dev.wisentini.startthecount.backend.rest.service.BoletimUrnaUsuarioService;
-import br.dev.wisentini.startthecount.backend.rest.service.QRCodeBoletimUrnaService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import jakarta.validation.Valid;
 
@@ -30,20 +20,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/boletins-urna")
+@RequestMapping(value = "/api/boletins-urna")
 @RequiredArgsConstructor
-@Tag(name = "boletins-urna")
-@SecurityRequirement(name = "bearerAuth")
 public class BoletimUrnaController {
 
     private final BoletimUrnaService boletimUrnaService;
 
     private final BoletimUrnaUsuarioService boletimUrnaUsuarioService;
-
-    private final QRCodeBoletimUrnaService qrCodeBoletimUrnaService;
 
     private final BoletimUrnaMapper boletimUrnaMapper;
 
@@ -51,15 +38,16 @@ public class BoletimUrnaController {
 
     private final QRCodeBoletimUrnaMapper qrCodeBoletimUrnaMapper;
 
-    @Operation(
-        summary = "Constrói um boletim de urna a partir de um ou mais payload(s) de QR code(s).",
-        description = "Constrói um boletim de urna a partir de um ou mais payload(s) de QR code(s)."
-    )
+    private final ApuracaoVotosCandidaturaBoletimUrnaMapper apuracaoVotosCandidaturaBoletimUrnaMapper;
+
+    private final ApuracaoVotosCargoBoletimUrnaMapper apuracaoVotosCargoBoletimUrnaMapper;
+
+    private final ApuracaoVotosPartidoBoletimUrnaMapper apuracaoVotosPartidoBoletimUrnaMapper;
+
     @PostMapping()
     @ResponseStatus(value = HttpStatus.CREATED)
     public ApiResponse<String> buildBoletimUrna(
         @AuthenticationPrincipal Usuario usuario,
-        @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "O(s) payload(s) do(s) QR code(s) do boletim de urna.")
         @Valid @RequestBody BoletimUrnaBuildDTO boletimUrnaBuildDTO
     ) {
         if (Objects.isNull(usuario)) {
@@ -71,17 +59,12 @@ public class BoletimUrnaController {
         return new ApiResponse<>("O boletim de urna foi criado com sucesso!", HttpStatus.CREATED);
     }
 
-    @Operation(summary = "Encontra um boletim de urna.", description = "Encontra um boletim de urna.")
-    @GetMapping(value = "/id")
+    @GetMapping(params = {"numeroTSESecao", "numeroTSEZona", "siglaUF", "codigoTSEPleito"})
     @ResponseStatus(value = HttpStatus.OK)
-    public BoletimUrnaRetrievalDTO findBoletimUrna(
-        @Parameter(description = "Os dados que identificam o boletim de urna.")
-        @Valid BoletimUrnaIdDTO id
-    ) {
+    public BoletimUrnaRetrievalDTO findBoletimUrna(@Valid BoletimUrnaIdDTO id) {
         return this.boletimUrnaMapper.toBoletimUrnaRetrievalDTO(this.boletimUrnaService.findById(id));
     }
 
-    @Operation(summary = "Encontra todos os boletins de urna.", description = "Encontra todos os boletins de urna.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<BoletimUrnaRetrievalDTO> findBoletinsUrna() {
@@ -92,31 +75,59 @@ public class BoletimUrnaController {
             .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Encontra todos os usuários que coletaram um boletim de urna.", description = "Encontra todos os usuários que coletaram um boletim de urna.")
-    @GetMapping(value = "/usuarios")
-    @ResponseStatus(value = HttpStatus.OK)
-    public List<UsuarioRetrievalDTO> findUsuarios(
-        @Parameter(description = "Os dados que identificam o boletim de urna.")
-        @Valid BoletimUrnaIdDTO id
-    ) {
-        return this.boletimUrnaUsuarioService
-            .findUsuariosByBoletimUrna(id)
-            .stream()
-            .map(this.usuarioMapper::toUsuarioRetrievalDTO)
-            .collect(Collectors.toList());
+    @DeleteMapping
+    @ResponseStatus(value = HttpStatus.ACCEPTED)
+    public void delete(@Valid BoletimUrnaIdDTO id) {
+        this.boletimUrnaService.deleteById(id);
     }
 
-    @Operation(summary = "Encontra todos os QR codes de um boletim de urna.", description = "Encontra todos os QR codes de um boletim de urna.")
+    @GetMapping(value = "/usuarios")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<UsuarioRetrievalDTO> findUsuarios(@Valid BoletimUrnaIdDTO id) {
+        return this.boletimUrnaService
+            .findUsuarios(id)
+            .stream()
+            .map(this.usuarioMapper::toUsuarioRetrievalDTO)
+            .collect(Collectors.toSet());
+    }
+
     @GetMapping(value = "/qr-codes")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<QRCodeBoletimUrnaRetrievalDTO> findQRCodes(
-        @Parameter(description = "Os dados que identificam o boletim de urna.")
-        @Valid BoletimUrnaIdDTO id
-    ) {
-        return this.qrCodeBoletimUrnaService
-            .findByBoletimUrna(id)
+    public Set<QRCodeBoletimUrnaRetrievalDTO> findQRCodes(@Valid BoletimUrnaIdDTO id) {
+        return this.boletimUrnaService
+            .findQRCodes(id)
             .stream()
             .map(this.qrCodeBoletimUrnaMapper::toQRCodeBoletimUrnaRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/apuracoes-votos-candidaturas")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO> findApuracoesVotosCandidaturas(@Valid BoletimUrnaIdDTO id) {
+        return this.boletimUrnaService
+            .findApuracoesVotosCandidaturas(id)
+            .stream()
+            .map(this.apuracaoVotosCandidaturaBoletimUrnaMapper::toApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/apuracoes-votos-cargos")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<ApuracaoVotosCargoBoletimUrnaRetrievalDTO> findApuracoesVotosCargos(@Valid BoletimUrnaIdDTO id) {
+        return this.boletimUrnaService
+            .findApuracoesVotosCargos(id)
+            .stream()
+            .map(this.apuracaoVotosCargoBoletimUrnaMapper::toApuracaoVotosCargoBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/apuracoes-votos-partidos")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<ApuracaoVotosPartidoBoletimUrnaRetrievalDTO> findApuracoesVotosPartidos(@Valid BoletimUrnaIdDTO id) {
+        return this.boletimUrnaService
+            .findApuracoesVotosPartidos(id)
+            .stream()
+            .map(this.apuracaoVotosPartidoBoletimUrnaMapper::toApuracaoVotosPartidoBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

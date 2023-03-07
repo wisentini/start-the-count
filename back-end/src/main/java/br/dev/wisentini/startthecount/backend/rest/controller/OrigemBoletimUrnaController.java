@@ -1,12 +1,10 @@
 package br.dev.wisentini.startthecount.backend.rest.controller;
 
-import br.dev.wisentini.startthecount.backend.rest.model.OrigemBoletimUrna;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.BoletimUrnaRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.OrigemBoletimUrnaRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.mapper.BoletimUrnaMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.OrigemBoletimUrnaMapper;
 import br.dev.wisentini.startthecount.backend.rest.service.OrigemBoletimUrnaService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,30 +12,45 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/origens-boletim-urna")
+@RequestMapping(value = "/api/origens-boletim-urna")
 @RequiredArgsConstructor
-@Tag(name = "origens-boletim-urna")
-@SecurityRequirement(name = "bearerAuth")
 public class OrigemBoletimUrnaController {
 
     private final OrigemBoletimUrnaService origemBoletimUrnaService;
 
-    @Operation(summary = "Encontra uma origem de boletim de urna.", description = "Encontra uma origem de boletim de urna.")
+    private final OrigemBoletimUrnaMapper origemBoletimUrnaMapper;
+
+    private final BoletimUrnaMapper boletimUrnaMapper;
+
     @GetMapping(value = "/{nomeAbreviado}")
     @ResponseStatus(value = HttpStatus.OK)
-    public OrigemBoletimUrna findOrigemBoletimUrna(
-        @Parameter(description = "O nome abreviado da origem de boletim de urna que deve ser encontrada.")
-        @PathVariable("nomeAbreviado") String nomeAbreviado
-    ) {
-        return this.origemBoletimUrnaService.findByNomeAbreviado(nomeAbreviado);
+    public OrigemBoletimUrnaRetrievalDTO findOrigemBoletimUrna(@PathVariable("nomeAbreviado") String nomeAbreviado) {
+        return this.origemBoletimUrnaMapper.toOrigemBoletimUrnaRetrievalDTO(
+            this.origemBoletimUrnaService.findByNomeAbreviado(nomeAbreviado)
+        );
     }
 
-    @Operation(summary = "Encontra todas origens de boletim de urna.", description = "Encontra todas origens de boletim de urna.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<OrigemBoletimUrna> findOrigensBoletimUrna() {
-        return this.origemBoletimUrnaService.findAll();
+    public List<OrigemBoletimUrnaRetrievalDTO> findOrigensBoletimUrna() {
+        return this.origemBoletimUrnaService
+            .findAll()
+            .stream()
+            .map(this.origemBoletimUrnaMapper::toOrigemBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/{nomeAbreviado}/boletins-urna")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<BoletimUrnaRetrievalDTO> findBoletinsUrna(@PathVariable("nomeAbreviado") String nomeAbreviado) {
+        return this.origemBoletimUrnaService
+            .findBoletinsUrna(nomeAbreviado)
+            .stream()
+            .map(this.boletimUrnaMapper::toBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

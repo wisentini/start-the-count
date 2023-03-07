@@ -13,16 +13,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CandidaturaMapper {
 
+    private final CandidatoMapper candidatoMapper;
+
     private final CargoEleicaoMapper cargoEleicaoMapper;
+
+    private final PartidoMapper partidoMapper;
 
     private final CandidatoService candidatoService;
 
     public CandidaturaRetrievalDTO toCandidaturaRetrievalDTO(Candidatura candidatura) {
         return new CandidaturaRetrievalDTO(
             candidatura.getId(),
-            this.candidatoService.findByCodigoTSE(candidatura.getCandidato().getCodigoTSE()),
+            this.candidatoMapper.toCandidatoRetrievalDTO(
+                this.candidatoService.findByCodigoTSE(candidatura.getCandidato().getCodigoTSE())
+            ),
             this.cargoEleicaoMapper.toCargoEleicaoRetrievalDTO(candidatura.getCargoEleicao()),
-            candidatura.getPartido()
+            this.partidoMapper.toPartidoRetrievalDTO(candidatura.getPartido())
         );
     }
 

@@ -28,7 +28,7 @@ public class QRCodeBoletimUrnaMapper {
         );
     }
 
-    public QRCodeBoletimUrnaIdDTO toQrCodeBoletimUrnaIdDTO(QRCodeBoletimUrna qrCodeBoletimUrna) {
+    public QRCodeBoletimUrnaIdDTO toQRCodeBoletimUrnaIdDTO(QRCodeBoletimUrna qrCodeBoletimUrna) {
         return new QRCodeBoletimUrnaIdDTO(
             qrCodeBoletimUrna.getIndice(),
             qrCodeBoletimUrna.getBoletimUrna().getSecaoPleito().getSecao().getNumeroTSE(),

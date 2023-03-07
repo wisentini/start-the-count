@@ -73,24 +73,24 @@ public class BoletimUrna implements Serializable {
     @OneToMany(mappedBy = "boletimUrna", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosCandidaturaBoletimUrna> apuracoesVotosCandidatura;
+    private Set<ApuracaoVotosCandidaturaBoletimUrna> apuracoesVotosCandidaturas;
 
     @OneToMany(mappedBy = "boletimUrna", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosCargoBoletimUrna> apuracoesVotosCargo;
+    private Set<ApuracaoVotosCargoBoletimUrna> apuracoesVotosCargos;
 
     @OneToMany(mappedBy = "boletimUrna", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<ApuracaoVotosPartidoBoletimUrna> apuracoesVotosPartido;
+    private Set<ApuracaoVotosPartidoBoletimUrna> apuracoesVotosPartidos;
 
     public BoletimUrna() {
         this.usuarios = new LinkedHashSet<>();
         this.qrCodes = new LinkedHashSet<>();
-        this.apuracoesVotosCandidatura = new LinkedHashSet<>();
-        this.apuracoesVotosCargo = new LinkedHashSet<>();
-        this.apuracoesVotosPartido = new LinkedHashSet<>();
+        this.apuracoesVotosCandidaturas = new LinkedHashSet<>();
+        this.apuracoesVotosCargos = new LinkedHashSet<>();
+        this.apuracoesVotosPartidos = new LinkedHashSet<>();
     }
 
     public BoletimUrna(SecaoPleito secaoPleito, Fase fase, OrigemBoletimUrna origem, UrnaEletronica urnaEletronica, String assinatura, Integer quantidadeTotalQRCodes, LocalDate dataEmissao, LocalTime horarioEmissao) {
@@ -103,6 +103,14 @@ public class BoletimUrna implements Serializable {
         this.quantidadeTotalQRCodes = quantidadeTotalQRCodes;
         this.dataEmissao = dataEmissao;
         this.horarioEmissao = horarioEmissao;
+    }
+
+    public Set<QRCodeBoletimUrna> getQRCodes() {
+        return this.qrCodes;
+    }
+
+    public void setQRCodes(Set<QRCodeBoletimUrna> qrCodes) {
+        this.qrCodes = qrCodes;
     }
 
     @Override

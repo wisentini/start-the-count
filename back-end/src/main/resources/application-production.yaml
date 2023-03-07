@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://start-the-count-database:5432/start_the_count
+  data:
+    redis:
+      host: start-the-count-cache

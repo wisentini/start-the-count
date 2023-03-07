@@ -1,4 +1,14 @@
 services:
+  start-the-count-back-end:
+    container_name: start_the_count_back_end
+    build:
+      context: ./back-end/
+      dockerfile: Dockerfile
+    image: start-the-count-back-end
+    ports:
+      - '8080:8080'
+    networks:
+      - start-the-count-network
   start-the-count-database:
     container_name: start_the_count_database
     build:
@@ -15,7 +25,6 @@ services:
       - ./.docker/start-the-count-database:/var/lib/postgresql/data
     networks:
       - start-the-count-network
-
   start-the-count-cache:
     container_name: start_the_count_cache
     image: redis:7
@@ -26,8 +35,33 @@ services:
       - ./.docker/start-the-count-cache:/data
     networks:
       - start-the-count-network
-
+  start-the-count-swagger-ui:
+    container_name: start_the_count_swagger_ui
+    image: swaggerapi/swagger-ui:v4.17.1
+    ports:
+      - 8081:8080
+    volumes:
+      - ./back-end/docs/openapi.yaml:/usr/share/nginx/html/openapi.yaml
+    environment:
+      BASE_URL: /swagger-ui
+      API_URL: openapi.yaml
+    networks:
+      - start-the-count-network
+  start-the-count-server:
+    container_name: start_the_count_server
+    image: nginx:1.23.3
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - start-the-count-back-end
+      - start-the-count-swagger-ui
+    networks:
+      - start-the-count-network
 networks:
   start-the-count-network:
     name: start_the_count_network
     driver: bridge
+    external: true

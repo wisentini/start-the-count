@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import lombok.*;
+
 import org.apache.commons.lang3.StringUtils;
 
 @Getter
@@ -21,7 +22,7 @@ public class AuthenticationRequestDTO {
     private String username;
 
     @NotBlank(message = "A senha deve ser informada para autenticar um usuário.")
-    @Size(min = 1, max = 72, message = "A senha deve ter no mínimo 1 caractere e no máximo 72 caracteres.")
+    @Size(min = 8, max = 72, message = "A senha deve ter no mínimo 8 caracteres e no máximo 72 caracteres.")
     private String senha;
 
     public void validate() {

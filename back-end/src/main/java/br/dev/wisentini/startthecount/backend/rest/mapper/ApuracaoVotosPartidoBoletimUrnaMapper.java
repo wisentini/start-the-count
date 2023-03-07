@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class ApuracaoVotosPartidoBoletimUrnaMapper {
 
+    private final PartidoMapper partidoMapper;
+
     private final BoletimUrnaMapper boletimUrnaMapper;
 
     private final CargoEleicaoMapper cargoEleicaoMapper;
@@ -19,7 +21,7 @@ public class ApuracaoVotosPartidoBoletimUrnaMapper {
     public ApuracaoVotosPartidoBoletimUrnaRetrievalDTO toApuracaoVotosPartidoBoletimUrnaRetrievalDTO(ApuracaoVotosPartidoBoletimUrna apuracaoVotosPartidoBoletimUrna) {
         return new ApuracaoVotosPartidoBoletimUrnaRetrievalDTO(
             apuracaoVotosPartidoBoletimUrna.getId(),
-            apuracaoVotosPartidoBoletimUrna.getPartido(),
+            this.partidoMapper.toPartidoRetrievalDTO(apuracaoVotosPartidoBoletimUrna.getPartido()),
             this.boletimUrnaMapper.toBoletimUrnaRetrievalDTO(apuracaoVotosPartidoBoletimUrna.getBoletimUrna()),
             this.cargoEleicaoMapper.toCargoEleicaoRetrievalDTO(apuracaoVotosPartidoBoletimUrna.getCargoEleicao()),
             apuracaoVotosPartidoBoletimUrna.getQuantidadeVotosDeLegenda(),

@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.0.1'
+    id 'org.springframework.boot' version '3.0.4'
     id 'io.spring.dependency-management' version '1.1.0'
 }
 
@@ -12,31 +12,34 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.1'
+    implementation 'org.jetbrains:annotations:23.0.0'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
 
     compileOnly 'org.projectlombok:lombok:1.18.24'
-    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.26'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.24'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.26'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.26'
 
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.14.2'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.2'
 
     implementation 'com.google.code.gson:gson:2.10'
 
-    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.2'
-    implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.2'
+    implementation 'org.springframework.boot:spring-boot-starter-web:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-validation:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-security:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-devtools:3.0.4'
+    implementation 'org.springframework.boot:spring-boot-starter-cache:3.0.4'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    implementation 'org.hibernate.orm:hibernate-core:6.1.6.Final'
+    implementation 'org.hibernate.orm:hibernate-core:6.1.7.Final'
 
-    implementation 'org.postgresql:postgresql:42.5.1'
+    implementation 'org.postgresql:postgresql:42.5.4'
 
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     implementation 'org.apache.commons:commons-collections4:4.4'
@@ -46,8 +49,6 @@ dependencies {
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
     implementation 'org.bouncycastle:bcprov-jdk15on:1.70'
-
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
     implementation 'redis.clients:jedis:4.3.1'
 

@@ -1,8 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.ProcessoEleitoral;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -14,16 +11,14 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder(value = {"id", "localVotacao", "secao", "processoEleitoral"})
+@JsonPropertyOrder(value = {"id", "secao", "processoEleitoral", "localVotacao"})
 public class SecaoProcessoEleitoralRetrievalDTO {
 
     private Integer id;
 
-    @JsonProperty(value = "localVotacao")
-    private LocalVotacaoRetrievalDTO localVotacaoRetrievalDTO;
+    private SecaoRetrievalDTO secao;
 
-    @JsonProperty(value = "secao")
-    private SecaoRetrievalDTO secaoRetrievalDTO;
+    private ProcessoEleitoralRetrievalDTO processoEleitoral;
 
-    private ProcessoEleitoral processoEleitoral;
+    private LocalVotacaoRetrievalDTO localVotacao;
 }

@@ -1,8 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.Cargo;
-import br.dev.wisentini.startthecount.backend.rest.model.Eleicao;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +16,7 @@ public class CargoEleicaoRetrievalDTO {
 
     private Integer id;
 
-    private Cargo cargo;
+    private CargoRetrievalDTO cargo;
 
-    private Eleicao eleicao;
+    private EleicaoRetrievalDTO eleicao;
 }

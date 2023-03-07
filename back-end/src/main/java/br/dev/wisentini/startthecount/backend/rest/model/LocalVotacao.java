@@ -1,22 +1,21 @@
 package br.dev.wisentini.startthecount.backend.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
-
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
-
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
 @Entity(name = "LocalVotacao")
-@Table(name = "local_votacao", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"num_tse_local_votacao", "id_zona"})})
+@Table(
+    name = "local_votacao",
+    schema = "public",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"num_tse_local_votacao", "id_zona"})})
 @Getter
 @Setter
 @ToString(doNotUseGetters = true)

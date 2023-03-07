@@ -1,0 +1,4396 @@
+openapi: 3.0.3
+info:
+  title: Start the Count API
+  contact:
+    email: marcosvisentini@gmail.com
+  license:
+    name: GPLv3
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+  version: v1
+servers:
+  - url: http://localhost/api
+    description: Desenvolvimento
+tags:
+  - name: usuarios
+    description: 'Operações sobre usuários.'
+  - name: boletins-urna
+    description: 'Operações sobre boletins de urna.'
+  - name: zonas
+    description: 'Operações sobre zonas.'
+  - name: secoes
+    description: 'Operações sobre seções.'
+  - name: locais-votacao
+    description: 'Operações sobre locais de votação.'
+  - name: partidos
+    description: 'Operações sobre partidos.'
+  - name: candidatos
+    description: 'Operações sobre candidatos.'
+  - name: candidaturas
+    description: 'Operações sobre candidaturas.'
+  - name: urnas-eletronicas
+    description: 'Operações sobre urnas eletrônicas.'
+  - name: qr-codes-boletim-urna
+    description: 'Operações sobre QR codes de boletim de urna.'
+  - name: eleicoes
+    description: 'Operações sobre eleições.'
+  - name: cargos
+    description: 'Operações sobre cargos.'
+  - name: processos-eleitorais
+    description: 'Operações sobre processos eleitorais.'
+  - name: pleitos
+    description: 'Operações sobre pleitos.'
+  - name: municipios
+    description: 'Operações sobre municípios.'
+  - name: ufs
+    description: 'Operações sobre UFs.'
+  - name: regioes
+    description: 'Operações sobre regiões.'
+  - name: tipos-cargo
+    description: 'Operações sobre tipos de cargo.'
+  - name: papeis
+    description: 'Operações sobre papéis.'
+  - name: permissoes
+    description: 'Operações sobre permissões.'
+  - name: origens-configuracao-processo-eleitoral
+    description: 'Operações sobre origens de configuração de processo eleitoral.'
+  - name: origens-boletim-urna
+    description: 'Operações sobre origens de boletim de urna.'
+  - name: fases
+    description: 'Operações sobre fases.'
+  - name: papeis-usuarios
+    description: 'Operações sobre relações entre papel e usuário.'
+  - name: papeis-permissoes
+    description: 'Operações sobre relações entre papel e permissão.'
+  - name: cargos-eleicoes
+    description: 'Operações sobre relações entre cargo e eleição.'
+  - name: secoes-processos-eleitorais
+    description: 'Operações sobre relações entre seção e processo eleitoral.'
+  - name: secoes-pleitos
+    description: 'Operações sobre relações entre seção e pleito.'
+  - name: boletins-urna-usuarios
+    description: 'Operações sobre relações entre boletim de urna e usuário.'
+  - name: apuracoes-votos-partidos
+    description: 'Operações sobre apurações de votos de partidos.'
+  - name: apuracoes-votos-partidos-boletim-urna
+    description: 'Operações sobre apurações de votos de partidos por boletim de urna.'
+  - name: apuracoes-votos-cargos
+    description: 'Operações sobre apurações de votos de cargos.'
+  - name: apuracoes-votos-cargos-boletim-urna
+    description: 'Operações sobre apurações de votos de cargos por boletim de urna.'
+  - name: apuracoes-votos-candidaturas
+    description: 'Operações sobre apurações de votos de candidaturas.'
+  - name: apuracoes-votos-candidaturas-boletim-urna
+    description: 'Operações sobre apurações de votos de candidaturas por boletim de urna.'
+  - name: agregacoes-secao
+    description: 'Operações sobre agregações de seção.'
+paths:
+  /usuarios:
+    get:
+      tags:
+        - usuarios
+      summary: 'Encontra todos os usuários.'
+      description: 'Encontra todos os usuários.'
+      operationId: findUsuarios
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /usuarios/{username}:
+    get:
+      tags:
+        - usuarios
+      summary: 'Encontra um usuário.'
+      description: 'Encontra um usuário.'
+      operationId: findUsuario
+      parameters:
+        - name: username
+          in: path
+          description: 'O username do usuário.'
+          required: true
+          schema:
+            type: string
+            example: wisentini
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+    patch:
+      tags:
+        - usuarios
+      summary: 'Atualiza um usuário.'
+      description: 'Atualiza um usuário.'
+      operationId: updateUsuario
+      parameters:
+        - name: username
+          in: path
+          description: 'O username do usuário.'
+          required: true
+          schema:
+            type: string
+            example: teste
+      requestBody:
+        description: 'Os novos dados do usuário.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioUpdateDTO'
+      responses:
+        '200':
+          description: Ok
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+    delete:
+      tags:
+        - usuarios
+      summary: 'Deleta um usuário.'
+      description: 'Deleta um usuário.'
+      operationId: deleteUsuario
+      parameters:
+        - name: username
+          in: path
+          description: 'O username do usuário.'
+          required: true
+          schema:
+            type: string
+            example: teste
+      responses:
+        '200':
+          description: Ok
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /usuarios/{username}/boletins-urna:
+    get:
+      tags:
+        - usuarios
+      summary: 'Encontra todos os boletins de urna coletados por um usuário.'
+      description: 'Encontra todos os boletins de urna coletados por um usuário.'
+      operationId: findBoletinsUrnaUsuario
+      parameters:
+        - name: username
+          in: path
+          description: 'O username do usuário.'
+          required: true
+          schema:
+            type: string
+            example: admin
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /usuarios/{username}/papeis:
+    get:
+      tags:
+        - usuarios
+      summary: 'Encontra todos os papéis de um usuário.'
+      description: 'Encontra todos os papéis de um usuário.'
+      operationId: findPapeisUsuario
+      parameters:
+        - name: username
+          in: path
+          description: 'O username do usuário.'
+          required: true
+          schema:
+            type: string
+            example: admin
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PapelRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /usuarios/current:
+    get:
+      tags:
+        - usuarios
+      summary: 'Retorna o usuário atual.'
+      description: 'Retorna o usuário atual.'
+      operationId: findCurrentUsuario
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /usuarios/login:
+    post:
+      tags:
+        - usuarios
+      summary: 'Autentica um usuário.'
+      description: 'Autentica um usuário.'
+      operationId: login
+      requestBody:
+        description: 'Os dados de autenticação do usuário.'
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequestDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+  /usuarios/create:
+    post:
+      tags:
+        - usuarios
+      summary: 'Cria um usuário.'
+      description: 'Cria um usuário.'
+      operationId: createUsuario
+      requestBody:
+        description: 'Os dados necessários para criar um usuário.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioCreationDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+  /boletins-urna:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra um ou mais boletins de urna.'
+      description: 'Se o parâmetro `id` for informado, é retornado o boletim de urna identificado por ele. Se não, são retornados todos os boletins de urna.'
+      operationId: findBoletinsUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BoletimUrnaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+    post:
+      tags:
+        - boletins-urna
+      summary: 'Constrói um boletim de urna a partir de um ou mais payloads de QR code.'
+      description: 'Constrói um boletim de urna a partir de um ou mais payloads de QR code.'
+      operationId: buildBoletimUrna
+      requestBody:
+        description: 'O(s) payload(s) do(s) QR code(s) do boletim de urna.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoletimUrnaBuildDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna/usuarios:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra todos os usuários que coletaram um boletim de urna.'
+      description: 'Encontra todos os usuários que coletaram um boletim de urna.'
+      operationId: findUsuariosBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna/qr-codes:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra todos os QR codes de um boletim de urna.'
+      description: 'Encontra todos os QR codes de um boletim de urna.'
+      operationId: findQRCodesBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QRCodeBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna/apuracoes-votos-partidos:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra todas as apurações de votos de partidos de um boletim de urna.'
+      description:  'Encontra todas as apurações de votos de partidos de um boletim de urna.'
+      operationId: findApuracoesVotosPartidosBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna/apuracoes-votos-cargos:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra todas as apurações de votos de cargos de um boletim de urna.'
+      description:  'Encontra todas as apurações de votos de cargos de um boletim de urna.'
+      operationId: findApuracoesVotosCargosBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna/apuracoes-votos-candidaturas:
+    get:
+      tags:
+        - boletins-urna
+      summary: 'Encontra todas as apurações de votos de candidaturas de um boletim de urna.'
+      description:  'Encontra todas as apurações de votos de candidaturas de um boletim de urna.'
+      operationId: findApuracoesVotosCandidaturasBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o boletim de urna.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /zonas:
+    get:
+      tags:
+        - zonas
+      summary: 'Encontra uma ou mais zonas.'
+      description: 'Se o parâmetro `id` for informado, é retornada a zona identificada por ele. Se não, são retornadas todas as zonas.'
+      operationId: findZonas
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a zona.'
+          schema:
+            $ref: '#/components/schemas/ZonaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ZonaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/ZonaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /zonas/secoes:
+    get:
+      tags:
+        - zonas
+      summary: 'Encontra todas as seções de uma zona.'
+      description: 'Encontra todas as seções de uma zona.'
+      operationId: findSecoesZona
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a zona.'
+          schema:
+            $ref: '#/components/schemas/ZonaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /zonas/locais-votacao:
+    get:
+      tags:
+        - zonas
+      summary: 'Encontra todos os locais de votação de uma zona.'
+      description: 'Encontra todos os locais de votação de uma zona.'
+      operationId: findLocaisVotacaoZona
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a zona.'
+          schema:
+            $ref: '#/components/schemas/ZonaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalVotacaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /urnas-eletronicas:
+    get:
+      tags:
+        - urnas-eletronicas
+      summary: 'Encontra todas as urnas eletrônicas.'
+      description: 'Encontra todas as urnas eletrônicas.'
+      operationId: 'findUrnasEletronicas'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UrnaEletronicaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /urnas-eletronicas/{numeroSerie}:
+    get:
+      tags:
+        - urnas-eletronicas
+      summary: 'Encontra uma urna eletrônica.'
+      description: 'Encontra uma urna eletrônica.'
+      operationId: findUrnaEletronica
+      parameters:
+        - name: numeroSerie
+          in: path
+          description: 'O número de série da urna eletrônica.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1678798
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UrnaEletronicaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /urnas-eletronicas/{numeroSerie}/boletins-urna:
+    get:
+      tags:
+        - urnas-eletronicas
+      summary: 'Encontra todos os boletins de urna de uma urna eletrônica.'
+      description: 'Encontra todos os boletins de urna de uma urna eletrônica.'
+      operationId: findBoletinsUrnaUrnaEletronica
+      parameters:
+        - name: numeroSerie
+          in: path
+          description: 'O número de série da urna eletrônica.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1678798
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /ufs:
+    get:
+      tags:
+        - ufs
+      summary: 'Encontra todas as UFs.'
+      description: 'Encontra todas as UFs.'
+      operationId: findUFs
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UFRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /ufs/{sigla}:
+    get:
+      tags:
+        - ufs
+      summary: 'Encontra uma UF.'
+      description: 'Encontra uma UF.'
+      operationId: findUF
+      parameters:
+        - name: sigla
+          in: path
+          description: 'A sigla da UF.'
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            example: RS
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UFRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /ufs/{sigla}/zonas:
+    get:
+      tags:
+        - ufs
+      summary: 'Encontra todas as zonas de uma UF.'
+      description: 'Encontra todas as zonas de uma UF.'
+      operationId: findZonasUF
+      parameters:
+        - name: sigla
+          in: path
+          description: 'A sigla da UF.'
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            example: RS
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ZonaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /ufs/{sigla}/municipios:
+    get:
+      tags:
+        - ufs
+      summary: 'Encontra todos os municípios de uma UF.'
+      description: 'Encontra todos os municípios de uma UF.'
+      operationId: findMunicipiosUF
+      parameters:
+        - name: sigla
+          in: path
+          description: 'A sigla da UF.'
+          required: true
+          schema:
+            type: string
+            minLength: 2
+            maxLength: 2
+            example: RS
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MunicipioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /tipos-cargo:
+    get:
+      tags:
+        - tipos-cargo
+      summary: 'Encontra todos os tipos de cargo.'
+      description: 'Encontra todos os tipos de cargo.'
+      operationId: findTiposCargo
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TipoCargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /tipos-cargo/{codigoTSE}:
+    get:
+      tags:
+        - tipos-cargo
+      summary: 'Encontra um tipo de cargo.'
+      description: 'Encontra um tipo de cargo.'
+      operationId: findTipoCargo
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do tipo de cargo.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TipoCargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /tipos-cargo/{codigoTSE}/cargos:
+    get:
+      tags:
+        - tipos-cargo
+      summary: 'Encontra todos os cargos que possuem determinado tipo.'
+      description: 'Encontra todos os cargos que possuem determinado tipo.'
+      operationId: findCargosTipoCargo
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do tipo de cargo.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 1
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes:
+    get:
+      tags:
+        - secoes
+      summary: 'Encontra uma ou mais seções.'
+      description: 'Se o parâmetro `id` for informado, é retornada a seção identificada por ele. Se não, são retornadas todas as seções.'
+      operationId: findSecoes
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a seção.'
+          schema:
+            $ref: '#/components/schemas/SecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SecaoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes/processos-eleitorais:
+    get:
+      tags:
+        - secoes
+      summary: 'Encontra todos os processos eleitorais de uma seção.'
+      description: 'Encontra todos os processos eleitorais de uma seção.'
+      operationId: findProcessosEleitoraisSecao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a seção.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/SecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes/pleitos:
+    get:
+      tags:
+        - secoes
+      summary: 'Encontra todos os pleitos de uma seção.'
+      description: 'Encontra todos os pleitos de uma seção.'
+      operationId: findPleitosSecao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a seção.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/SecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PleitoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes/principais:
+    get:
+      tags:
+        - secoes
+      summary: 'Encontra todas as seções principais de uma seção.'
+      description: 'Encontra todas as seções principais de uma seção.'
+      operationId: findSecoesPrincipaisSecao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a seção.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/SecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes/agregadas:
+    get:
+      tags:
+        - secoes
+      summary: 'Encontra todas as seções agregadas de uma seção.'
+      description: 'Encontra todas as seções agregadas de uma seção.'
+      operationId: findSecoesAgregadasSecao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a seção.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/SecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes-processos-eleitorais:
+    get:
+      tags:
+        - secoes-processos-eleitorais
+      summary: 'Encontra uma ou mais relações entre seção e processo eleitoral.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre seção e processo eleitoral identificada por ele. Se não, são retornadas todas as relações entre seção e processo eleitoral.'
+      operationId: findSecoesProcessosEleitorais
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre seção e processo eleitoral.'
+          schema:
+            $ref: '#/components/schemas/SecaoProcessoEleitoralIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SecaoProcessoEleitoralRetrievalDTOArray'
+                  - $ref: '#/components/schemas/SecaoProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes-pleitos:
+    get:
+      tags:
+        - secoes-pleitos
+      summary: 'Encontra uma ou mais relações entre seção e pleito.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre seção e pleito identificada por ele. Se não, são retornadas todas as relações entre seção e pleito.'
+      operationId: findSecoesPleitos
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre seção e pleito.'
+          schema:
+            $ref: '#/components/schemas/SecaoPleitoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/SecaoPleitoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/SecaoPleitoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /secoes-pleitos/boletins-urna:
+    get:
+      tags:
+        - secoes-pleitos
+      summary: 'Encontra todos os boletins de urna de uma relação entre seção e pleito.'
+      description: 'Encontra todos os boletins de urna de uma relação entre seção e pleito.'
+      operationId: findBoletinsUrnaSecaoPleito
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre seção e pleito.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/SecaoPleitoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /regioes:
+    get:
+      tags:
+        - regioes
+      summary: 'Encontra todas as regiões.'
+      description: 'Encontra todas as regiões.'
+      operationId: findRegioes
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RegiaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /regioes/{sigla}:
+    get:
+      tags:
+        - regioes
+      summary: 'Encontra uma região.'
+      description: 'Encontra uma região.'
+      operationId: findRegiao
+      parameters:
+        - name: sigla
+          in: path
+          description: 'A sigla da região.'
+          required: true
+          schema:
+            type: string
+            example: CO
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegiaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /regioes/{sigla}/ufs:
+    get:
+      tags:
+        - regioes
+      summary: 'Encontra todas as UFs de uma região.'
+      description: 'Encontra todas as UFs de uma região.'
+      operationId: findUFsRegiao
+      parameters:
+        - name: sigla
+          in: path
+          description: 'A sigla da região.'
+          required: true
+          schema:
+            type: string
+            example: CO
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UFRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /qr-codes-boletim-urna:
+    get:
+      tags:
+        - qr-codes-boletim-urna
+      summary: 'Encontra um ou mais QR codes de boletim de urna.'
+      description: 'Se o parâmetro `id` for informado, é retornado um QR code de boletim de urna identificado por ele. Se não, são retornados todos os QR codes de boletim de urna.'
+      operationId: findQRCodes
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o QR code de boletim de urna.'
+          schema:
+            $ref: '#/components/schemas/QRCodeBoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/QRCodeBoletimUrnaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/QRCodeBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /processos-eleitorais:
+    get:
+      tags:
+        - processos-eleitorais
+      summary: 'Encontra todos os processos eleitorais.'
+      description: 'Encontra todos os processos eleitorais.'
+      operationId: findProcessosEleitorais
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /processos-eleitorais/{codigoTSE}:
+    get:
+      tags:
+        - processos-eleitorais
+      summary: 'Encontra um processo eleitoral.'
+      description: 'Encontra um processo eleitoral.'
+      operationId: findProcessoEleitoral
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do processo eleitoral.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 406
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /processos-eleitorais/{codigoTSE}/secoes:
+    get:
+      tags:
+        - processos-eleitorais
+      summary: 'Encontra todas as seções de um processo eleitoral.'
+      description: 'Encontra todas as seções de um processo eleitoral.'
+      operationId: findSecoesProcessoEleitoral
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do processo eleitoral.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 406
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /processos-eleitorais/{codigoTSE}/agregacoes-secao:
+    get:
+      tags:
+        - processos-eleitorais
+      summary: 'Encontra todas as agregações de seção que ocorreram em um processo eleitoral.'
+      description: 'Encontra todas as agregações de seção que ocorreram em um processo eleitoral.'
+      operationId: findAgregacoesSecaoProcessoEleitoral
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do processo eleitoral.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 406
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgregacaoSecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /processos-eleitorais/{codigoTSE}/pleitos:
+    get:
+      tags:
+        - processos-eleitorais
+      summary: 'Encontra todos os pleitos de um processo eleitoral.'
+      description: 'Encontra todos os pleitos de um processo eleitoral.'
+      operationId: findPleitosProcessoEleitoral
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do processo eleitoral.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 406
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PleitoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /pleitos:
+    get:
+      tags:
+        - pleitos
+      summary: 'Encontra todos os pleitos.'
+      description: 'Encontra todos os pleitos.'
+      operationId: findPleitos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PleitoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /pleitos/{codigoTSE}:
+    get:
+      tags:
+        - pleitos
+      summary: 'Encontra um pleito.'
+      description: 'Encontra um pleito.'
+      operationId: findPleito
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do pleito.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 655
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PleitoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /pleitos/{codigoTSE}/secoes:
+    get:
+      tags:
+        - pleitos
+      summary: 'Encontra todas as seções de um pleito.'
+      description: 'Encontra todas as seções de um pleito.'
+      operationId: findSecoesPleito
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do pleito.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 655
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /pleitos/{codigoTSE}/eleicoes:
+    get:
+      tags:
+        - pleitos
+      summary: 'Encontra todas as eleições de um pleito.'
+      description: 'Encontra todas as eleições de um pleito.'
+      operationId: findEleicoesPleito
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do pleito.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 655
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EleicaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis:
+    get:
+      tags:
+        - papeis
+      summary: 'Encontra todos os papéis.'
+      description: 'Encontra todos os papéis.'
+      operationId: findPapeis
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PapelRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis/{nome}:
+    get:
+      tags:
+        - papeis
+      summary: 'Encontra um papel.'
+      description: 'Encontra um papel.'
+      operationId: findPapel
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome do papel.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 15
+            example: DBA
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PapelRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis/{nome}/usuarios:
+    get:
+      tags:
+        - papeis
+      summary: 'Encontra todos os usuários que possuem determinado papel.'
+      description: 'Encontra todos os usuários que possuem determinado papel.'
+      operationId: findUsuariosPapel
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome do papel.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 15
+            example: DBA
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis/{nome}/permissoes:
+    get:
+      tags:
+        - papeis
+      summary: 'Encontra todas as permissões que um papel possui.'
+      description: 'Encontra todas as permissões que um papel possui.'
+      operationId: findPermissoesPapel
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome do papel.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 15
+            example: DBA
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PermissaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /permissoes:
+    get:
+      tags:
+        - permissoes
+      summary: 'Encontra todas as permissões.'
+      description: 'Encontra todas as permissões.'
+      operationId: findPermissoes
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PermissaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /permissoes/{nome}:
+    get:
+      tags:
+        - permissoes
+      summary: 'Encontra uma permissão.'
+      description: 'Encontra uma permissão.'
+      operationId: findPermissao
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome da permissão.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 31
+            example: leitura
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /permissoes/{nome}/papeis:
+    get:
+      tags:
+        - permissoes
+      summary: 'Encontra todos os papéis que possuem determinada permissão.'
+      description: 'Encontra todos os papéis que possuem determinada permissão.'
+      operationId: findPapeisPermissao
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome da permissão.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 31
+            example: escrita
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PapelRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis-usuarios:
+    get:
+      tags:
+        - papeis-usuarios
+      summary: 'Encontra uma ou mais relações entre papel e usuário.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre papel e usuário identificada por ele. Se não, são retornadas todas as relações entre papel e usuário.'
+      operationId: findPapeisUsuarios
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre papel e usuário.'
+          schema:
+            $ref: '#/components/schemas/PapelUsuarioIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PapelUsuarioRetrievalDTOArray'
+                  - $ref: '#/components/schemas/PapelUsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /papeis-permissoes:
+    get:
+      tags:
+        - papeis-permissoes
+      summary: 'Encontra uma ou mais relações entre papel e permissão.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre papel e permissão identificada por ele. Se não, são retornadas todas as relações entre papel e permissão.'
+      operationId: findPapeisPermissoes
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre papel e permissão.'
+          schema:
+            $ref: '#/components/schemas/PapelPermissaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PapelPermissaoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/PapelPermissaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-configuracao-processo-eleitoral:
+    get:
+      tags:
+        - origens-configuracao-processo-eleitoral
+      summary: 'Encontra todas as origens de configuração de processo eleitoral.'
+      description: 'Encontra todas as origens de configuração de processo eleitoral.'
+      operationId: findOrigensConfiguracaoProcessoEleitoral
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrigemConfiguracaoProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-configuracao-processo-eleitoral/{nomeAbreviado}:
+    get:
+      tags:
+        - origens-configuracao-processo-eleitoral
+      summary: 'Encontra uma origem de configuração de processo eleitoral.'
+      description: 'Encontra uma origem de configuração de processo eleitoral.'
+      operationId: findOrigemConfiguracaoProcessoEleitoral
+      parameters:
+        - name: nomeAbreviado
+          in: path
+          description: 'O nome abreviado da origem de configuração de processo eleitoral.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 3
+            example: LEG
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrigemConfiguracaoProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-configuracao-processo-eleitoral/{nomeAbreviado}/processos-eleitorais:
+    get:
+      tags:
+        - origens-configuracao-processo-eleitoral
+      summary: 'Encontra todos os processos eleitorais com determinada origem de configuração.'
+      description: 'Encontra todos os processos eleitorais com determinada origem de configuração.'
+      operationId: findProcessosEleitoraisOrigemConfiguracaoProcessoEleitoral
+      parameters:
+        - name: nomeAbreviado
+          in: path
+          description: 'O nome abreviado da origem de configuração de processo eleitoral.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 3
+            example: LEG
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-boletim-urna:
+    get:
+      tags:
+        - origens-boletim-urna
+      summary: 'Encontra todas as origens de boletim de urna.'
+      description: 'Encontra todas as origens de boletim de urna.'
+      operationId: findOrigensBoletimUrna
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrigemBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-boletim-urna/{nomeAbreviado}:
+    get:
+      tags:
+        - origens-boletim-urna
+      summary: 'Encontra uma origem de boletim de urna.'
+      description: 'Encontra uma origem de boletim de urna.'
+      operationId: findOrigemBoletimUrna
+      parameters:
+        - name: nomeAbreviado
+          in: path
+          description: 'O nome abreviado da origem de boletim de urna.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 7
+            example: Vota
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrigemBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /origens-boletim-urna/{nomeAbreviado}/boletins-urna:
+    get:
+      tags:
+        - origens-boletim-urna
+      summary: 'Encontra todos os boletins de urna que possuem determinada origem.'
+      description: 'Encontra todos os boletins de urna que possuem determinada origem.'
+      operationId: findBoletinsUrnaOrigemBoletimUrna
+      parameters:
+        - name: nomeAbreviado
+          in: path
+          description: 'O nome abreviado da origem de boletim de urna.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 7
+            example: Vota
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /municipios:
+    get:
+      tags:
+        - municipios
+      summary: 'Encontra todos os municípios.'
+      description: 'Encontra todos os municípios.'
+      operationId: findMunicipios
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MunicipioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /municipios/{codigoTSE}:
+    get:
+      tags:
+        - municipios
+      summary: 'Encontra um município.'
+      description: 'Encontra um município.'
+      operationId: findMunicipio
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do município.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 86290
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MunicipioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /municipios/{codigoTSE}/locais-votacao:
+    get:
+      tags:
+        - municipios
+      summary: 'Encontra todos os locais de votação de um município.'
+      description: 'Encontra todos os locais de votação de um município.'
+      operationId: findLocaisVotacaoMunicipio
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do município.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 86290
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocalVotacaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /locais-votacao:
+    get:
+      tags:
+        - locais-votacao
+      summary: 'Encontra um ou mais locais de votação.'
+      description: 'Se o parâmetro `id` for informado, é retornado um local de votação identificado por ele. Se não, são retornados todos os locais de votação.'
+      operationId: findLocaisVotacao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o local de votação.'
+          schema:
+            $ref: '#/components/schemas/LocalVotacaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/LocalVotacaoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/LocalVotacaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /locais-votacao/secoes:
+    get:
+      tags:
+        - locais-votacao
+      summary: 'Encontra todas as seções de um local de votação.'
+      description: 'Encontra todas as seções de um local de votação.'
+      operationId: findSecoesLocalVotacao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam o local de votação.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/LocalVotacaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /fases:
+    get:
+      tags:
+        - fases
+      summary: 'Encontra todas as fases.'
+      description: 'Encontra todas as fases.'
+      operationId: findFases
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FaseRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /fases/{nome}:
+    get:
+      tags:
+        - fases
+      summary: 'Encontra uma fase.'
+      description: 'Encontra uma fase.'
+      operationId: findFase
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome da fase.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 15
+            example: Oficial
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaseRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /fases/{nome}/boletins-urna:
+    get:
+      tags:
+        - fases
+      summary: 'Encontra todos os boletins de urna de uma fase.'
+      description: 'Encontra todos os boletins de urna de uma fase.'
+      operationId: findBoletinsUrnaFase
+      parameters:
+        - name: nome
+          in: path
+          description: 'O nome da fase.'
+          required: true
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 15
+            example: Oficial
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /eleicoes:
+    get:
+      tags:
+        - eleicoes
+      summary: 'Encontra todas as eleições.'
+      description: 'Encontra todas as eleições.'
+      operationId: findEleicoes
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EleicaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /eleicoes/{codigoTSE}:
+    get:
+      tags:
+        - eleicoes
+      summary: 'Encontra uma eleição.'
+      description: 'Encontra uma eleição.'
+      operationId: findEleicao
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código da eleição.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 329
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EleicaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /eleicoes/{codigoTSE}/cargos:
+    get:
+      tags:
+        - eleicoes
+      summary: 'Encontra todos os cargos de uma eleição.'
+      description: 'Encontra todos os cargos de uma eleição.'
+      operationId: findCargosEleicao
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código da eleição.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 329
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos:
+    get:
+      tags:
+        - cargos
+      summary: 'Encontra todos os cargos.'
+      description: 'Encontra todos os cargos.'
+      operationId: findCargos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos/{codigoTSE}:
+    get:
+      tags:
+        - cargos
+      summary: 'Encontra um cargo.'
+      description: 'Encontra um cargo.'
+      operationId: findCargo
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do cargo.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 2
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos/{codigoTSE}/eleicoes:
+    get:
+      tags:
+        - cargos
+      summary: 'Encontra todas as eleições de um cargo.'
+      description: 'Encontra todas as eleições de um cargo.'
+      operationId: findEleicoesCargo
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do cargo.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 2
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EleicaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos-eleicoes:
+    get:
+      tags:
+        - cargos-eleicoes
+      summary: 'Encontra uma ou mais relações entre cargo e eleição.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre cargo e eleição identificado por ele. Se não, são retornadas todas as relações entre cargo e eleição.'
+      operationId: findCargosEleicoes
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre cargo e eleição.'
+          schema:
+            $ref: '#/components/schemas/CargoEleicaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CargoEleicaoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/CargoEleicaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos-eleicoes/candidaturas:
+    get:
+      tags:
+        - cargos-eleicoes
+      summary: 'Encontra todas as candidaturas de uma relação entre cargo e eleição.'
+      description: 'Encontra todas as candidaturas de uma relação entre cargo e eleição.'
+      operationId: findCandidaturasCargoEleicao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre cargo e eleição.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/CargoEleicaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos-eleicoes/apuracoes-votos-partidos-boletim-urna:
+    get:
+      tags:
+        - cargos-eleicoes
+      summary: 'Encontra todas as apurações de votos de partidos por boletim de urna de uma relação entre cargo e eleição.'
+      description: 'Encontra todas as apurações de votos de partidos por boletim de urna de uma relação entre cargo e eleição.'
+      operationId: findApuracoesVotosPartidosBoletimUrnaCargoEleicao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre cargo e eleição.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/CargoEleicaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /cargos-eleicoes/apuracoes-votos-cargos-boletim-urna:
+    get:
+      tags:
+        - cargos-eleicoes
+      summary: 'Encontra todas as apurações de votos de cargos por boletim de urna de uma relação entre cargo e eleição.'
+      description: 'Encontra todas as apurações de votos de cargos por boletim de urna de uma relação entre cargo e eleição.'
+      operationId: findApuracoesVotosCargosBoletimUrnaCargoEleicao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre cargo e eleição.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/CargoEleicaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /candidaturas:
+    get:
+      tags:
+        - candidaturas
+      summary: 'Encontra uma ou mais candidaturas.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma candidatura identificado por ele. Se não, são retornadas todas as candidaturas.'
+      operationId: findCandidaturas
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a candidatura.'
+          schema:
+            $ref: '#/components/schemas/CandidaturaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/CandidaturaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /candidaturas/apuracoes-votos-boletim-urna:
+    get:
+      tags:
+        - candidaturas
+      summary: 'Encontra todas as apurações de votos por boletim de urna de uma candidatura.'
+      description: 'Encontra todas as apurações de votos por boletim de urna de uma candidatura.'
+      operationId: findApuracoesVotosCandidaturaBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a candidatura.'
+          required: true
+          schema:
+            $ref: '#/components/schemas/CandidaturaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /partidos:
+    get:
+      tags:
+        - partidos
+      summary: 'Encontra todos os partidos.'
+      description: 'Encontra todos os partidos.'
+      operationId: findPartidos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PartidoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /partidos/{numeroTSE}:
+    get:
+      tags:
+        - partidos
+      summary: 'Encontra um partido.'
+      description: 'Encontra um partido.'
+      operationId: findPartido
+      parameters:
+        - name: numeroTSE
+          in: path
+          description: 'O número do partido.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 11
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PartidoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /partidos/{numeroTSE}/candidaturas:
+    get:
+      tags:
+        - partidos
+      summary: 'Encontra todas as candidaturas de um partido.'
+      description: 'Encontra todas as candidaturas de um partido.'
+      operationId: findCandidaturasPartido
+      parameters:
+        - name: numeroTSE
+          in: path
+          description: 'O número do partido.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 11
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /partidos/{numeroTSE}/apuracoes-votos-boletim-urna:
+    get:
+      tags:
+        - partidos
+      summary: 'Encontra todas as apurações de votos por boletim de urna de um partido.'
+      description: 'Encontra todas as apurações de votos por boletim de urna de um partido.'
+      operationId: findApuracoesVotosPartidoBoletimUrna
+      parameters:
+        - name: numeroTSE
+          in: path
+          description: 'O número do partido.'
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 11
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /candidatos:
+    get:
+      tags:
+        - candidatos
+      summary: 'Encontra todos os candidatos.'
+      description: 'Encontra todos os candidatos.'
+      operationId: findCandidatos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidatoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /candidatos/{codigoTSE}:
+    get:
+      tags:
+        - candidatos
+      summary: 'Encontra um candidato.'
+      description: 'Encontra um candidato.'
+      operationId: findCandidato
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do candidato.'
+          required: true
+          schema:
+            type: string
+            example: 210001601593
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CandidatoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /candidatos/{codigoTSE}/candidaturas:
+    get:
+      tags:
+        - candidatos
+      summary: 'Encontra todas as candidaturas de um candidato.'
+      description: 'Encontra todas as candidaturas de um candidato.'
+      operationId: findCandidaturasCandidato
+      parameters:
+        - name: codigoTSE
+          in: path
+          description: 'O código do candidato.'
+          required: true
+          schema:
+            type: string
+            example: 210001601593
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /boletins-urna-usuarios:
+    get:
+      tags:
+        - boletins-urna-usuarios
+      summary: 'Encontra uma ou mais relações entre boletim de urna e usuário.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma relação entre boletim de urna e usuário identificado por ele. Se não, são retornadas todas as relações entre boletim de urna e usuário.'
+      operationId: findBoletinsUrnaUsuarios
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a relação entre boletim de urna e usuário.'
+          schema:
+            $ref: '#/components/schemas/BoletimUrnaUsuarioIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/BoletimUrnaUsuarioRetrievalDTOArray'
+                  - $ref: '#/components/schemas/BoletimUrnaUsuarioRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-candidaturas-boletim-urna:
+    get:
+      tags:
+        - apuracoes-votos-candidaturas-boletim-urna
+      summary: 'Encontra uma ou mais apurações de votos de candidaturas por boletim de urna.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma apuração identificada por ele. Se não, são retornadas todas as apurações.'
+      operationId: findApuracoesVotosCandidaturasPorBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a apuração.'
+          schema:
+            $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-candidaturas:
+    get:
+      tags:
+        - apuracoes-votos-candidaturas
+      summary: 'Encontra todas as apurações de votos de candidaturas.'
+      description: 'Encontra todas as apurações de votos de candidaturas.'
+      operationId: findApuracoesVotosCandidaturas
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCandidaturaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-cargos-boletim-urna:
+    get:
+      tags:
+        - apuracoes-votos-cargos-boletim-urna
+      summary: 'Encontra uma ou mais apurações de votos de cargos por boletim de urna.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma apuração identificada por ele. Se não, são retornadas todas as apurações.'
+      operationId: findApuracoesVotosCargosPorBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a apuração.'
+          schema:
+            $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-cargos:
+    get:
+      tags:
+        - apuracoes-votos-cargos
+      summary: 'Encontra todas as apurações de votos de cargos.'
+      description: 'Encontra todas as apurações de votos de cargos.'
+      operationId: findApuracoesVotosCargos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosCargoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-partidos-boletim-urna:
+    get:
+      tags:
+        - apuracoes-votos-partidos-boletim-urna
+      summary: 'Encontra uma ou mais apurações de votos de partidos por boletim de urna.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma apuração identificada por ele. Se não, são retornadas todas as apurações.'
+      operationId: findApuracoesVotosPartidosPorBoletimUrna
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a apuração.'
+          schema:
+            $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTOArray'
+                  - $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /apuracoes-votos-partidos:
+    get:
+      tags:
+        - apuracoes-votos-partidos
+      summary: 'Encontra todas as apurações de votos de partidos.'
+      description: 'Encontra todas as apurações de votos de partidos.'
+      operationId: findApuracoesVotosPartidos
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApuracaoVotosPartidoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+  /agregacoes-secao:
+    get:
+      tags:
+        - agregacoes-secao
+      summary: 'Encontra uma ou mais agregações de seção.'
+      description: 'Se o parâmetro `id` for informado, é retornada uma agregação de seção identificada por ele. Se não, são retornadas todas as agregações de seção.'
+      operationId: findAgregacoesSecao
+      parameters:
+        - in: query
+          name: id
+          description: 'Os dados que identificam a agregação de seção.'
+          schema:
+            $ref: '#/components/schemas/AgregacaoSecaoIdDTO'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/AgregacaoSecaoRetrievalDTOArray'
+                  - $ref: '#/components/schemas/AgregacaoSecaoRetrievalDTO'
+        '4XX':
+          description: 'Client error'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiErrorResponse'
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    UsuarioRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        username:
+          type: string
+          example: wisentini
+        nome:
+          type: string
+          example: Marcos
+        sobrenome:
+          type: string
+          example: Visentini
+        papeis:
+          type: array
+          items:
+            type: string
+          example: [ADMIN, USER]
+        criadoEm:
+          type: string
+          format: date-time
+          example: 03/03/2023 09:29:16
+        atualizadoEm:
+          type: string
+          format: date-time
+          example: 12/05/2023 14:05:23
+    RegiaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 6
+        codigoIBGE:
+          type: integer
+          format: int64
+          example: 4
+        nome:
+          type: string
+          example: Sul
+        sigla:
+          type: string
+          example: S
+    UFRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 22
+        codigoIBGE:
+          type: integer
+          format: int64
+          example: 43
+        nome:
+          type: string
+          example: 'Rio Grande do Sul'
+        sigla:
+          type: string
+          example: RS
+        regiao:
+          $ref: '#/components/schemas/RegiaoRetrievalDTO'
+    ZonaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 34
+        numeroTSE:
+          type: integer
+          format: int64
+          example: 18
+        uf:
+          $ref: '#/components/schemas/UFRetrievalDTO'
+    SecaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        numeroTSE:
+          type: integer
+          format: int64
+          example: 112
+        zona:
+          $ref: '#/components/schemas/ZonaRetrievalDTO'
+    OrigemConfiguracaoProcessoEleitoralRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: 'Eleição legal oficial'
+        nomeAbreviado:
+          type: string
+          example: LEG
+    ProcessoEleitoralRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 395
+        nome:
+          type: string
+          example: 'Eleições Gerais 2022'
+        origemConfiguracao:
+          $ref: '#/components/schemas/OrigemConfiguracaoProcessoEleitoralRetrievalDTO'
+    PleitoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 406
+        nome:
+          type: string
+          example: '1º turno'
+        turno:
+          type: integer
+          format: int64
+          example: 1
+        data:
+          type: string
+          format: date
+          example: 02/10/2022
+        processoEleitoral:
+          $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+    SecaoPleitoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        secao:
+          $ref: '#/components/schemas/SecaoRetrievalDTO'
+        pleito:
+          $ref: '#/components/schemas/PleitoRetrievalDTO'
+    FaseRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 2
+        nome:
+          type: string
+          example: Oficial
+    OrigemBoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: 'Software de Votação'
+        nomeAbreviado:
+          type: string
+          example: Vota
+    UrnaEletronicaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        numeroSerie:
+          type: integer
+          format: int64
+          example: 1303045
+        codigoIdentificacaoCarga:
+          type: string
+          example: '904585283618888740610421'
+        versaoSoftware:
+          type: string
+          example: '8.26.0.0'
+        dataAbertura:
+          type: string
+          format: date
+          example: 02/10/2022
+        horarioAbertura:
+          type: string
+          format: time
+          example: 08:00:01
+        dataFechamento:
+          type: string
+          format: date
+          example: 02/10/2022
+        horarioFechamento:
+          type: string
+          format: time
+          example: 17:04:48
+    BoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        secaoPleito:
+          $ref: '#/components/schemas/SecaoPleitoRetrievalDTO'
+        fase:
+          $ref: '#/components/schemas/FaseRetrievalDTO'
+        origem:
+          $ref: '#/components/schemas/OrigemBoletimUrnaRetrievalDTO'
+        urnaEletronica:
+          $ref: '#/components/schemas/UrnaEletronicaRetrievalDTO'
+        assinatura:
+          type: string
+          example: A68CF51ECA1A79BB80D5514012AB8D2E7424291023FB42E0CFEB4849D7337720434E8D30C798230B5695D1ADF19B2142AAC1687A1C6D81BC37A406041E238D00
+        quantidadeTotalQRCodes:
+          type: integer
+          format: int64
+          example: 3
+        dataEmissao:
+          type: string
+          format: date
+          example: 02/10/2022
+        horarioEmissao:
+          type: string
+          format: time
+          example: 17:05:53
+    MunicipioRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1661
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 86290
+        codigoIBGE:
+          type: integer
+          format: int64
+          example: 4306601
+        nome:
+          type: string
+          example: 'Dom Pedrito'
+        uf:
+          $ref: '#/components/schemas/UFRetrievalDTO'
+    LocalVotacaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 60
+        numeroTSE:
+          type: integer
+          format: int64
+          example: 1368
+        nome:
+          type: string
+          example: 'E. M. E. F. DR. JOSE TUDE DE GODOY'
+        zona:
+          $ref: '#/components/schemas/ZonaRetrievalDTO'
+        municipio:
+          $ref: '#/components/schemas/MunicipioRetrievalDTO'
+    SecaoProcessoEleitoralRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        secao:
+          $ref: '#/components/schemas/SecaoRetrievalDTO'
+        processoEleitoral:
+          $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+        localVotacao:
+          $ref: '#/components/schemas/LocalVotacaoRetrievalDTO'
+    QRCodeBoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 200
+        boletimUrna:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        cabecalho:
+          type: string
+          example: 'QRBU:1:3 VRQR:1.5 VRCH:20220829'
+        conteudo:
+          type: string
+          example: 'ORIG:VOTA ORLC:LEG PROC:395 DTPL:20221002 PLEI:406 TURN:1 FASE:O UNFE:RS MUNI:86290 ZONA:18 SECA:112 IDUE:1303045 IDCA:904585283618888740610421 VERS:8.26.0.0 LOCA:1368 APTO:344 COMP:260 FALT:84 HBMA:43 DTAB:20221002 HRAB:080001 DTFC:20221002 HRFC:170448 IDEL:546 CARG:6 TIPO:1 VERC:202209131721 PART:10 1010:4 1012:1 1014:3 1022:6 1033:1 LEGP:0 TOTP:15 PART:11 1111:1 1133:6 1166:78 1181:1 1199:1 LEGP:4 TOTP:91 PART:12 1200:2 1212:2 1234:2 1278:1 LEGP:0 TOTP:7 PART:13 1301:1 1307:37 1313:1 1320:1 1370:6 1380:8 LEGP:6 TOTP:60 PART:15 1520:2 LEGP:0 TOTP:2 PART:19 1901:1 1911:1 1922:1 1944:3 1977:1 LEGP:0 TOTP:7 PART:20 2040:1 LEGP:0 TOTP:1 PART:22 2200:1 2210:1 2214:1 2220:1 2233:1 2234:6 LEGP:1 TOTP:12 PART:23 2323:1 LEGP:0 TOTP:1 PART:30 3030:1 LEGP:0 TOTP:1 PART:40 4001:2 4040:3 LEGP:0 TOTP:5 PART:44 4410:3'
+        hash:
+          type: string
+          example: 'C3DC38F0DE32B800A30CE97603FFBB35857179653DBD4F7B3B0C6E7DA907B5AFE6CA80642F0ED488AF37C9127AC22678B5C87BDA0CA6A4750A0705F6EA0AE955'
+        indice:
+          type: integer
+          format: int64
+          example: 1
+        numeroCiclosEleitoraisDesdeImplementacao:
+          type: integer
+          format: int64
+          example: 1
+        numeroRevisoesFormatoCiclo:
+          type: integer
+          format: int64
+          example: 5
+        numeroVersaoChaveAssinatura:
+          type: integer
+          format: int64
+          example: 20220829
+    PapelUsuarioRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        usuario:
+          $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        papel:
+          $ref: '#/components/schemas/PapelRetrievalDTO'
+    PapelRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 4
+        nome:
+          type: string
+          example: ADMIN
+        descricao:
+          type: string
+          example: 'Administrador'
+    PermissaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        nome:
+          type: string
+          example: ESCRITA
+        descricao:
+          type: string
+          example: 'Acesso para escrita'
+    PapelPermissaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        papel:
+          $ref: '#/components/schemas/PapelRetrievalDTO'
+        permissao:
+          $ref: '#/components/schemas/PermissaoRetrievalDTO'
+    TipoCargoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 1
+        nome:
+          type: string
+          example: 'Proporcional'
+    CargoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 6
+        nome:
+          type: string
+          example: 'Deputado Federal'
+        nomeAbreviado:
+          type: string
+          example: 'Dep. Fed.'
+        tipo:
+          $ref: '#/components/schemas/TipoCargoRetrievalDTO'
+    EleicaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        codigoTSE:
+          type: integer
+          format: int64
+          example: 546
+        nome:
+          type: string
+          example: 'Eleições Gerais Estaduais 2022'
+        ano:
+          type: integer
+          format: int64
+          example: 2022
+        quantidadeVotosCargosMajoritarios:
+          type: integer
+          format: int64
+          example: 197
+        quantidadeVotosCargosProporcionais:
+          type: integer
+          format: int64
+          example: 64
+        pleito:
+          $ref: '#/components/schemas/PleitoRetrievalDTO'
+    CargoEleicaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+        cargo:
+          $ref: '#/components/schemas/CargoRetrievalDTO'
+        eleicao:
+          $ref: '#/components/schemas/EleicaoRetrievalDTO'
+    CandidatoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        numeroTSE:
+          type: integer
+          format: int64
+          example: 1166
+        codigoTSE:
+          type: string
+          example: '210001646689'
+        nome:
+          type: string
+          example: 'AFONSO HAMM'
+    PartidoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 2
+        numeroTSE:
+          type: integer
+          format: int64
+          example: 11
+        nome:
+          type: string
+          example: PROGRESSISTAS
+        sigla:
+          type: string
+          example: PP
+    CandidaturaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        candidato:
+          $ref: '#/components/schemas/CandidatoRetrievalDTO'
+        cargoEleicao:
+          $ref: '#/components/schemas/CargoEleicaoRetrievalDTO'
+        partido:
+          $ref: '#/components/schemas/PartidoRetrievalDTO'
+    BoletimUrnaUsuarioRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 61
+        usuario:
+          $ref: '#/components/schemas/UsuarioRetrievalDTO'
+        boletimUrna:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        coletadoEm:
+          type: string
+          format: date-time
+          example: '19/02/2023 08:57:56'
+        atualizadoEm:
+          type: string
+          format: date-time
+          example: '23/03/2023 16:20:41'
+    ApuracaoVotosPartidoRetrievalDTO:
+      type: object
+      properties:
+        numeroPartido:
+          type: integer
+          format: int64
+          example: 11
+        nomePartido:
+          type: string
+          example: PROGRESSISTAS
+        codigoCargo:
+          type: integer
+          format: int64
+          example: 6
+        nomeCargo:
+          type: string
+          example: 'Deputado Federal'
+        codigoEleicao:
+          type: integer
+          format: int64
+          example: 546
+        nomeEleicao:
+          type: string
+          example: 'Eleições Gerais Estaduais 2022'
+        codigoPleito:
+          type: integer
+          format: int64
+          example: 406
+        turno:
+          type: integer
+          format: int64
+          example: 1
+        quantidadeVotosDeLegenda:
+          type: integer
+          format: int64
+          example: 56
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 2249
+    ApuracaoVotosPartidoBoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 3192
+        partido:
+          $ref: '#/components/schemas/PartidoRetrievalDTO'
+        boletimUrna:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        cargoEleicao:
+          $ref: '#/components/schemas/CargoEleicaoRetrievalDTO'
+        quantidadeVotosDeLegenda:
+          type: integer
+          format: int64
+          example: 4
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 91
+    ApuracaoVotosCargoRetrievalDTO:
+      type: object
+      properties:
+        codigoCargo:
+          type: integer
+          format: int64
+          example: 6
+        nomeCargo:
+          type: string
+          example: 'Deputado Federal'
+        codigoEleicao:
+          type: integer
+          format: int64
+          example: 546
+        nomeEleicao:
+          type: string
+          example: 'Eleições Gerais Estaduais 2022'
+        codigoPleito:
+          type: integer
+          format: int64
+          example: 406
+        turno:
+          type: integer
+          format: int64
+          example: 1
+        quantidadeVotosNominais:
+          type: integer
+          format: int64
+          example: 23064
+        quantidadeVotosDeLegenda:
+          type: integer
+          format: int64
+          example: 894
+        quantidadeVotosEmBranco:
+          type: integer
+          format: int64
+          example: 2134
+        quantidadeVotosNulos:
+          type: integer
+          format: int64
+          example: 932
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 27024
+    ApuracaoVotosCargoBoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 301
+        cargoEleicao:
+          $ref: '#/components/schemas/CargoEleicaoRetrievalDTO'
+        boletimUrna:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        quantidadeEleitoresAptos:
+          type: integer
+          format: int64
+          example: 344
+        quantidadeComparecimentoCargoSemCandidatos:
+          type: integer
+          format: int64
+          example: 0
+        quantidadeVotosNominais:
+          type: integer
+          format: int64
+          example: 217
+        quantidadeVotosDeLegenda:
+          type: integer
+          format: int64
+          example: 12
+        quantidadeVotosEmBranco:
+          type: integer
+          format: int64
+          example: 29
+        quantidadeVotosNulos:
+          type: integer
+          format: int64
+          example: 2
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 260
+    ApuracaoVotosCandidaturaRetrievalDTO:
+      type: object
+      properties:
+        numeroCandidato:
+          type: integer
+          format: int64
+          example: 1922
+        nomeCandidato:
+          type: string
+          example: 'MAURICIO MARCON'
+        codigoCargo:
+          type: integer
+          format: int64
+          example: 6
+        nomeCargo:
+          type: string
+          example: 'Deputado Federal'
+        codigoEleicao:
+          type: integer
+          format: int64
+          example: 546
+        nomeEleicao:
+          type: string
+          example: 'Eleições Gerais Estaduais 2022'
+        codigoPleito:
+          type: integer
+          format: int64
+          example: 406
+        turno:
+          type: integer
+          format: int64
+          example: 1
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 1015
+    ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 7529
+        candidatura:
+          $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+        boletimUrna:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+        totalVotosApurados:
+          type: integer
+          format: int64
+          example: 78
+    AgregacaoSecaoRetrievalDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 14
+        secaoPrincipal:
+          $ref: '#/components/schemas/SecaoRetrievalDTO'
+        secaoAgregada:
+          $ref: '#/components/schemas/SecaoRetrievalDTO'
+        processoEleitoral:
+          $ref: '#/components/schemas/ProcessoEleitoralRetrievalDTO'
+    UsuarioCreationDTO:
+      type: object
+      required:
+        - username
+        - senha
+        - nomesPapeis
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 31
+          example: teste
+        senha:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          example: teste123
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 127
+          example: 'João'
+        sobrenome:
+          type: string
+          minLength: 1
+          maxLength: 127
+          example: 'da Silva'
+        nomesPapeis:
+          type: array
+          items:
+            type: string
+            minLength: 1
+            maxLength: 15
+          example: [USER]
+    UsuarioUpdateDTO:
+      type: object
+      required:
+        - senha
+        - nome
+        - sobrenome
+      properties:
+        senha:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          example: teste1234
+        nome:
+          type: string
+          minLength: 1
+          maxLength: 127
+          example: 'Miguel'
+        sobrenome:
+          type: string
+          minLength: 1
+          maxLength: 127
+          example: 'Silveira'
+    AuthenticationRequestDTO:
+      type: object
+      required:
+        - username
+        - senha
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 31
+          example: admin
+        senha:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 72
+          example: admin123
+    BoletimUrnaBuildDTO:
+      type: object
+      required:
+        - payloads
+      properties:
+        payloads:
+          type: array
+          items:
+            type: string
+          example: ['QRBU:1:3 VRQR:1.5 VRCH:20220829 ORIG:VOTA ORLC:LEG PROC:395 DTPL:20221002 PLEI:406 TURN:1 FASE:O UNFE:RS MUNI:84891 ZONA:11 SECA:129 IDUE:1678798 IDCA:614979838198585678607730 VERS:8.26.0.0 LOCA:1112 APTO:327 COMP:266 FALT:61 HBMA:30 DTAB:20221002 HRAB:080001 DTFC:20221002 HRFC:171020 IDEL:546 CARG:6 TIPO:1 VERC:202209131721 PART:10 1000:1 1010:2 1014:1 1022:3 1040:1 1044:1 LEGP:0 TOTP:9 PART:11 1111:2 1144:111 1155:1 1166:3 1199:1 LEGP:2 TOTP:120 PART:12 1212:4 1234:2 LEGP:0 TOTP:6 PART:13 1307:5 1355:49 1370:3 LEGP:4 TOTP:61 PART:14 1414:1 LEGP:0 TOTP:1 PART:15 1500:1 1501:1 1515:4 1590:2 LEGP:0 TOTP:8 PART:19 1901:1 1909:1 1922:2 1930:1 1944:1 1977:4 LEGP:0 TOTP:10 PART:22 2200:2 2202:1 2210:1 2214:1 2234:1 2244:1 LEGP:0 TOTP:7 PART:23 2323:3 LEGP:0 TOTP:3 PART:30 3000:1 3030:5 LEGP:0 TOTP:6 PART:43 4343:2 LEGP:0 TOTP:2 PART:44 4400:1 4312AFFAC5FFE88683F14A1FF09A79E9D71E084834A3713F43ABF4592BF7C861187DD49D65791442AF3CC6D88DB187BE7860237F5F29CCEFC5069637C328885A', 'QRBU:2:3 VRQR:1.5 VRCH:20220829 4411:1 4422:1 LEGP:0 TOTP:3 PART:45 4511:2 4545:1 4566:1 LEGP:0 TOTP:4 PART:50 5010:1 5050:2 LEGP:0 TOTP:3 PART:55 5512:1 5577:2 LEGP:0 TOTP:3 PART:77 7797:1 LEGP:0 TOTP:1 APTA:327 NOMI:241 LEGC:6 BRAN:13 NULO:6 TOTC:266 CARG:7 TIPO:1 VERC:202209131721 PART:10 10022:2 10040:2 10122:1 10200:1 10222:3 10300:2 10800:4 LEGP:1 TOTP:16 PART:11 11000:1 11011:1 11012:79 11111:2 11190:1 11240:6 11411:1 11555:29 11777:1 11999:3 LEGP:4 TOTP:128 PART:12 12050:1 12220:3 12777:3 LEGP:1 TOTP:8 PART:13 13007:1 13114:8 13120:2 13456:10 13655:3 13690:2 13813:12 13888:2 LEGP:9 TOTP:49 PART:15 15015:1 15200:3 15615:1 15777:1 15789:1 LEGP:0 TOTP:7 PART:16 LEGP:1 TOTP:1 PART:19 19140:2 19177:2 19234:1 19300:1 19444:2 19777:1 LEGP:1 TOTP:10 PART:20 20222:1 LEGP:0 TOTP:1 PART:22 22000:1 22212:1 22214:1 22222:1 LEGP:1 TOTP:5 PART:23 25C826B103C37BE389F9054AF7307A68E75F195C0E7EF2C3D93152E956C1E61EC75CF6C8C3C69D41E18E66CB9AF9E4DAA63B04B8FE4965717CB85D45AC455F79', 'QRBU:3:3 VRQR:1.5 VRCH:20220829 23456:1 LEGP:0 TOTP:1 PART:28 28000:2 LEGP:0 TOTP:2 PART:30 30456:1 LEGP:0 TOTP:1 PART:44 44000:1 44190:1 44192:2 44560:1 LEGP:0 TOTP:5 PART:45 45000:1 45111:1 45200:1 LEGP:0 TOTP:3 PART:50 50000:2 50123:1 LEGP:0 TOTP:3 PART:55 55123:1 LEGP:1 TOTP:2 PART:77 77377:1 LEGP:0 TOTP:1 APTA:327 NOMI:224 LEGC:19 BRAN:15 NULO:8 TOTC:266 CARG:5 TIPO:0 VERC:202209131721 100:78 111:24 131:101 200:1 555:22 700:1 APTA:327 NOMI:227 BRAN:20 NULO:19 TOTC:266 CARG:3 TIPO:0 VERC:202209131721 11:67 12:2 13:82 20:5 22:57 30:1 45:33 APTA:327 NOMI:247 BRAN:10 NULO:9 TOTC:266 IDEL:544 CARG:1 TIPO:0 VERC:202209081640 12:4 13:136 14:1 15:6 22:105 30:1 44:1 APTA:327 NOMI:254 BRAN:4 NULO:8 TOTC:266 8E000C30521E58CF41F2D1E86FA6198DD1AAEFCE1AAA3B03FAF6F0791E45A46F70BAB73D4A73CF8182229A0E8048262001857BAF532207FE30514C857A0D3EF6 0B61D74201F308D7899961BD4D58B7AAE5F436C287AC3DDC4AA312DEAC14EC24FD8F30F0BF140FE22F5B9D2913D417359C6C0A2A3D7C096EA4FE1284ED092504']
+    ZonaIdDTO:
+      type: object
+      required:
+        - numeroTSEZona
+        - siglaUF
+      properties:
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+    SecaoIdDTO:
+      type: object
+      required:
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+      properties:
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+    SecaoProcessoEleitoralIdDTO:
+      type: object
+      required:
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEProcessoEleitoral
+      properties:
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEProcessoEleitoral:
+          type: integer
+          format: int64
+          example: 395
+    SecaoPleitoIdDTO:
+      type: object
+      required:
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    BoletimUrnaIdDTO:
+      type: object
+      required:
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    QRCodeBoletimUrnaIdDTO:
+      type: object
+      required:
+        - indice
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        indice:
+          type: integer
+          format: int64
+          example: 1
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    BoletimUrnaUsuarioIdDTO:
+      type: object
+      required:
+        - username
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 31
+          example: wisentini
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    PapelUsuarioIdDTO:
+      type: object
+      required:
+        - username
+        - nomePapel
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 31
+          example: admin
+        nomePapel:
+          type: string
+          minLength: 1
+          maxLength: 15
+          example: ADMIN
+    PapelPermissaoIdDTO:
+      type: object
+      required:
+        - nomePapel
+        - nomePermissao
+      properties:
+        nomePapel:
+          type: string
+          minLength: 1
+          maxLength: 15
+          example: ADMIN
+        nomePermissao:
+          type: string
+          minLength: 1
+          maxLength: 31
+          example: ESCRITA
+    LocalVotacaoIdDTO:
+      type: object
+      required:
+        - numeroTSELocalVotacao
+        - numeroTSEZona
+        - siglaUF
+      properties:
+        numeroTSELocalVotacao:
+          type: integer
+          format: int64
+          example: 1368
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+    CargoEleicaoIdDTO:
+      type: object
+      required:
+        - codigoTSECargo
+        - codigoTSEEleicao
+      properties:
+        codigoTSECargo:
+          type: integer
+          format: int64
+          example: 6
+        codigoTSEEleicao:
+          type: integer
+          format: int64
+          example: 546
+    CandidaturaIdDTO:
+      type: object
+      required:
+        - numeroTSECandidato
+        - codigoTSECargo
+        - codigoTSEEleicao
+      properties:
+        numeroTSECandidato:
+          type: integer
+          format: int64
+          example: 1166
+        codigoTSECargo:
+          type: integer
+          format: int64
+          example: 6
+        codigoTSEEleicao:
+          type: integer
+          format: int64
+          example: 546
+    ApuracaoVotosPartidoBoletimUrnaIdDTO:
+      type: object
+      required:
+        - numeroTSEPartido
+        - codigoTSECargo
+        - codigoTSEEleicao
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        numeroTSEPartido:
+          type: integer
+          format: int64
+          example: 11
+        codigoTSECargo:
+          type: integer
+          format: int64
+          example: 6
+        codigoTSEEleicao:
+          type: integer
+          format: int64
+          example: 546
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    ApuracaoVotosCargoBoletimUrnaIdDTO:
+      type: object
+      required:
+        - codigoTSECargo
+        - codigoTSEEleicao
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        codigoTSECargo:
+          type: integer
+          format: int64
+          example: 6
+        codigoTSEEleicao:
+          type: integer
+          format: int64
+          example: 546
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    ApuracaoVotosCandidaturaBoletimUrnaIdDTO:
+      type: object
+      required:
+        - numeroTSECandidato
+        - codigoTSECargo
+        - codigoTSEEleicao
+        - numeroTSESecao
+        - numeroTSEZona
+        - siglaUF
+        - codigoTSEPleito
+      properties:
+        numeroTSECandidato:
+          type: integer
+          format: int64
+          example: 1166
+        codigoTSECargo:
+          type: integer
+          format: int64
+          example: 6
+        codigoTSEEleicao:
+          type: integer
+          format: int64
+          example: 546
+        numeroTSESecao:
+          type: integer
+          format: int64
+          example: 112
+        numeroTSEZona:
+          type: integer
+          format: int64
+          example: 18
+        siglaUF:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEPleito:
+          type: integer
+          format: int64
+          example: 406
+    AgregacaoSecaoIdDTO:
+      type: object
+      required:
+        - numeroTSESecaoPrincipal
+        - numeroTSEZonaSecaoPrincipal
+        - siglaUFSecaoPrincipal
+        - numeroTSESecaoAgregada
+        - numeroTSEZonaSecaoAgregada
+        - siglaUFSecaoAgregada
+        - codigoTSEProcessoEleitoral
+      properties:
+        numeroTSESecaoPrincipal:
+          type: integer
+          format: int64
+          example: 57
+        numeroTSEZonaSecaoPrincipal:
+          type: integer
+          format: int64
+          example: 146
+        siglaUFSecaoPrincipal:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        numeroTSESecaoAgregada:
+          type: integer
+          format: int64
+          example: 141
+        numeroTSEZonaSecaoAgregada:
+          type: integer
+          format: int64
+          example: 146
+        siglaUFSecaoAgregada:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: RS
+        codigoTSEProcessoEleitoral:
+          type: integer
+          format: int64
+          example: 395
+    ApiResponse:
+      type: object
+      required:
+        - status
+        - content
+        - timestamp
+      properties:
+        status:
+          type: string
+          example: OK
+        content:
+          type: string
+          example: 'Conteúdo da resposta'
+        timestamp:
+          type: string
+          format: date-time
+          example: '03/03/2023 16:25:00'
+    ApiError:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: 'Descrição detalhada de um erro'
+    ApiErrorResponse:
+      type: object
+      required:
+        - status
+        - errors
+        - timestamp
+      properties:
+        status:
+          type: string
+          example: BAD_REQUEST
+        description:
+          type: string
+          example: 'Descrição genérica de um ou mais erros'
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiError'
+        timestamp:
+          type: string
+          format: date-time
+          example: '05/03/2023 09:43:11'
+    ApiEmptyResponse:
+      type: object
+    BoletimUrnaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/BoletimUrnaRetrievalDTO'
+    ZonaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/ZonaRetrievalDTO'
+    SecaoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/SecaoRetrievalDTO'
+    SecaoProcessoEleitoralRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/SecaoProcessoEleitoralRetrievalDTO'
+    SecaoPleitoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/SecaoPleitoRetrievalDTO'
+    QRCodeBoletimUrnaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/QRCodeBoletimUrnaRetrievalDTO'
+    PapelUsuarioRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/PapelUsuarioRetrievalDTO'
+    PapelPermissaoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/PapelPermissaoRetrievalDTO'
+    LocalVotacaoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/LocalVotacaoRetrievalDTO'
+    CargoEleicaoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/CargoEleicaoRetrievalDTO'
+    CandidaturaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/CandidaturaRetrievalDTO'
+    BoletimUrnaUsuarioRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/BoletimUrnaUsuarioRetrievalDTO'
+    ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/ApuracaoVotosCandidaturaBoletimUrnaRetrievalDTO'
+    ApuracaoVotosCargoBoletimUrnaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/ApuracaoVotosCargoBoletimUrnaRetrievalDTO'
+    ApuracaoVotosPartidoBoletimUrnaRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/ApuracaoVotosPartidoBoletimUrnaRetrievalDTO'
+    AgregacaoSecaoRetrievalDTOArray:
+        type: array
+        items:
+          $ref: '#/components/schemas/AgregacaoSecaoRetrievalDTO'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

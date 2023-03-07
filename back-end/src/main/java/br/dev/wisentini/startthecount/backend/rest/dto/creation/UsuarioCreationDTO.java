@@ -36,9 +36,9 @@ public class UsuarioCreationDTO {
     @Size(min = 1, max = 127, message = "O sobrenome deve possuir no mínimo 1 caractere e no máximo 127 caracteres.")
     private String sobrenome;
 
-    @NotNull(message = "O(s) nome(s) do(s) tipo(s) de usuário deve(m) ser informado(s) para criar um usuário.")
-    @NotEmpty(message = "O(s) nome(s) do(s) tipo(s) de usuário deve(m) ser informado(s) para criar um usuário.")
-    private Set<String> nomesTiposUsuario;
+    @NotNull(message = "O(s) nome(s) do(s) papel(papéis) de usuário deve(m) ser informado(s) para criar um usuário.")
+    @NotEmpty(message = "O(s) nome(s) do(s) papel(papéis) de usuário deve(m) ser informado(s) para criar um usuário.")
+    private Set<String> nomesPapeis;
 
     public void validate() {
         if (StringUtils.isBlank(this.username)) {
@@ -65,8 +65,8 @@ public class UsuarioCreationDTO {
             throw new CampoInvalidoException("O sobrenome deve possuir no mínimo 1 caractere e no máximo 127 caracteres.");
         }
 
-        if (Objects.isNull(this.nomesTiposUsuario) || this.nomesTiposUsuario.isEmpty()) {
-            throw new CampoFaltanteException("O(s) nome(s) do(s) tipo(s) de usuário deve(m) ser informado(s) para criar um usuário.");
+        if (Objects.isNull(this.nomesPapeis) || this.nomesPapeis.isEmpty()) {
+            throw new CampoFaltanteException("O(s) nome(s) do(s) papel(papéis) de usuário deve(m) ser informado(s) para criar um usuário.");
         }
     }
 }

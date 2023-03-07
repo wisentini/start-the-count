@@ -14,11 +14,13 @@ public class SecaoPleitoMapper {
 
     private final SecaoMapper secaoMapper;
 
+    private final PleitoMapper pleitoMapper;
+
     public SecaoPleitoRetrievalDTO toSecaoPleitoRetrievalDTO(SecaoPleito secaoPleito) {
         return new SecaoPleitoRetrievalDTO(
             secaoPleito.getId(),
             this.secaoMapper.toSecaoRetrievalDTO(secaoPleito.getSecao()),
-            secaoPleito.getPleito()
+            this.pleitoMapper.toPleitoRetrievalDTO(secaoPleito.getPleito())
         );
     }
 

@@ -1,12 +1,10 @@
 package br.dev.wisentini.startthecount.backend.rest.controller;
 
-import br.dev.wisentini.startthecount.backend.rest.model.TipoCargo;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.CargoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.TipoCargoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.mapper.CargoMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.TipoCargoMapper;
 import br.dev.wisentini.startthecount.backend.rest.service.TipoCargoService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -14,30 +12,43 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/tipos-cargo")
+@RequestMapping(value = "/api/tipos-cargo")
 @RequiredArgsConstructor
-@Tag(name = "tipos-cargo")
-@SecurityRequirement(name = "bearerAuth")
 public class TipoCargoController {
 
     private final TipoCargoService tipoCargoService;
 
-    @Operation(summary = "Encontra um tipo de cargo.", description = "Encontra um tipo de cargo.")
+    private final TipoCargoMapper tipoCargoMapper;
+
+    private final CargoMapper cargoMapper;
+
     @GetMapping(value = "/{codigoTSE}")
     @ResponseStatus(value = HttpStatus.OK)
-    public TipoCargo findTipoCargo(
-        @Parameter(description = "O nome do tipo de cargo que deve ser encontrado.")
-        @PathVariable("codigoTSE") int codigoTSE
-    ) {
-        return this.tipoCargoService.findByCodigoTSE(codigoTSE);
+    public TipoCargoRetrievalDTO findTipoCargo(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.tipoCargoMapper.toTipoCargoRetrievalDTO(this.tipoCargoService.findByCodigoTSE(codigoTSE));
     }
 
-    @Operation(summary = "Encontra todos os tipos de cargo.", description = "Encontra todos os tipos de cargo.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<TipoCargo> findTiposCargo() {
-        return this.tipoCargoService.findAll();
+    public List<TipoCargoRetrievalDTO> findTiposCargo() {
+        return this.tipoCargoService
+            .findAll()
+            .stream()
+            .map(this.tipoCargoMapper::toTipoCargoRetrievalDTO)
+            .collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/{codigoTSE}/cargos")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<CargoRetrievalDTO> findCargos(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.tipoCargoService
+            .findCargos(codigoTSE)
+            .stream()
+            .map(this.cargoMapper::toCargoRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

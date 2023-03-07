@@ -1,8 +1,9 @@
 spring:
+  profiles:
+    active: production
   datasource:
     username: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/start_the_count
     driver-class-name: org.postgresql.Driver
   jpa:
     properties:
@@ -19,10 +20,6 @@ spring:
     type: redis
   data:
     redis:
-      host: localhost
       port: 6379
       repositories:
         enabled: false
-springdoc:
-  swagger-ui:
-    operations-sorter: method

@@ -4,17 +4,18 @@ import br.dev.wisentini.startthecount.backend.rest.dto.id.BoletimUrnaIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoPleitoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
 import br.dev.wisentini.startthecount.backend.rest.mapper.BoletimUrnaMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.BoletimUrna;
+import br.dev.wisentini.startthecount.backend.rest.model.*;
 import br.dev.wisentini.startthecount.backend.rest.repository.BoletimUrnaRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @CacheConfig(cacheNames = "boletim-urna")
@@ -34,6 +35,8 @@ public class BoletimUrnaService {
 
     private final BoletimUrnaMapper boletimUrnaMapper;
 
+    private final CachingService cachingService;
+
     @Autowired
     public BoletimUrnaService(
         QRCodeBoletimUrnaService qrCodeBoletimUrnaService,
@@ -42,7 +45,8 @@ public class BoletimUrnaService {
         ApuracaoVotosPartidoBoletimUrnaService apuracaoVotosPartidoBoletimUrnaService,
         @Lazy BoletimUrnaUsuarioService boletimUrnaUsuarioService,
         BoletimUrnaRepository boletimUrnaRepository,
-        @Lazy BoletimUrnaMapper boletimUrnaMapper
+        @Lazy BoletimUrnaMapper boletimUrnaMapper,
+        CachingService cachingService
     ) {
         this.qrCodeBoletimUrnaService = qrCodeBoletimUrnaService;
         this.apuracaoVotosCandidaturaBoletimUrnaService = apuracaoVotosCandidaturaBoletimUrnaService;
@@ -51,6 +55,7 @@ public class BoletimUrnaService {
         this.boletimUrnaUsuarioService = boletimUrnaUsuarioService;
         this.boletimUrnaRepository = boletimUrnaRepository;
         this.boletimUrnaMapper = boletimUrnaMapper;
+        this.cachingService = cachingService;
     }
 
     @Cacheable(key = "T(java.lang.String).format('%d:%d:%s:%d', #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
@@ -72,11 +77,36 @@ public class BoletimUrnaService {
         return this.boletimUrnaRepository.findAll();
     }
 
-    public List<BoletimUrna> findByUrnaEletronica(Integer numeroSerieUrnaEletronica) {
-        return this.boletimUrnaRepository.findByUrnaEletronicaNumeroSerie(numeroSerieUrnaEletronica);
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<Usuario> findUsuarios(BoletimUrnaIdDTO id) {
+        return this
+            .findById(id)
+            .getUsuarios()
+            .stream()
+            .map(BoletimUrnaUsuario::getUsuario)
+            .collect(Collectors.toSet());
     }
 
-    @CacheEvict(allEntries = true)
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<QRCodeBoletimUrna> findQRCodes(BoletimUrnaIdDTO id) {
+        return this.findById(id).getQRCodes();
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<ApuracaoVotosCandidaturaBoletimUrna> findApuracoesVotosCandidaturas(BoletimUrnaIdDTO id) {
+        return this.findById(id).getApuracoesVotosCandidaturas();
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<ApuracaoVotosCargoBoletimUrna> findApuracoesVotosCargos(BoletimUrnaIdDTO id) {
+        return this.findById(id).getApuracoesVotosCargos();
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
+    public Set<ApuracaoVotosPartidoBoletimUrna> findApuracoesVotosPartidos(BoletimUrnaIdDTO id) {
+        return this.findById(id).getApuracoesVotosPartidos();
+    }
+
     public BoletimUrna getIfExistsOrElseSave(BoletimUrna boletimUrna) {
         if (this.boletimUrnaRepository.existsBySecaoPleitoSecaoNumeroTSEAndSecaoPleitoSecaoZonaNumeroTSEAndSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndSecaoPleitoPleitoCodigoTSE(
             boletimUrna.getSecaoPleito().getSecao().getNumeroTSE(),
@@ -87,10 +117,11 @@ public class BoletimUrnaService {
             return this.findById(this.boletimUrnaMapper.toBoletimUrnaIdDTO(boletimUrna));
         }
 
+        this.cachingService.evictAllCaches();
+
         return this.boletimUrnaRepository.save(boletimUrna);
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteById(BoletimUrnaIdDTO id) {
         id.validate();
 
@@ -115,13 +146,16 @@ public class BoletimUrnaService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteBySecaoPleito(SecaoPleitoIdDTO id) {
         id.validate();
 
         this.deleteById(new BoletimUrnaIdDTO(id.getNumeroTSESecao(), id.getNumeroTSEZona(), id.getSiglaUF(), id.getCodigoTSEPleito()));
+
+        this.cachingService.evictAllCaches();
     }
 
     private void deleteOrphanRelationships(BoletimUrna boletimUrna) {
@@ -134,30 +168,33 @@ public class BoletimUrnaService {
         this.boletimUrnaUsuarioService.deleteByBoletimUrna(id);
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteByFase(String nomefase) {
         this.boletimUrnaRepository
             .findByFaseNomeEqualsIgnoreCase(nomefase)
             .forEach(this::deleteOrphanRelationships);
 
         this.boletimUrnaRepository.deleteByFaseNomeEqualsIgnoreCase(nomefase);
+
+        this.cachingService.evictAllCaches();
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteByOrigemBoletimUrna(String nomeAbreviadoOrigemBoletimUrna) {
         this.boletimUrnaRepository
             .findByOrigemNomeAbreviadoEqualsIgnoreCase(nomeAbreviadoOrigemBoletimUrna)
             .forEach(this::deleteOrphanRelationships);
 
         this.boletimUrnaRepository.deleteByOrigemNomeAbreviadoEqualsIgnoreCase(nomeAbreviadoOrigemBoletimUrna);
+
+        this.cachingService.evictAllCaches();
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteByUrnaEletronica(Integer numeroSerieUrnaEletronica) {
         this.boletimUrnaRepository
             .findByUrnaEletronicaNumeroSerie(numeroSerieUrnaEletronica)
             .forEach(this::deleteOrphanRelationships);
 
         this.boletimUrnaRepository.deleteByUrnaEletronicaNumeroSerie(numeroSerieUrnaEletronica);
+
+        this.cachingService.evictAllCaches();
     }
 }

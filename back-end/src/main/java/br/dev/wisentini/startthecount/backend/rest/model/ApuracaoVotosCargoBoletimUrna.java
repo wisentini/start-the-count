@@ -9,7 +9,10 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity(name = "ApuracaoVotosCargo")
-@Table(name = "apuracao_votos_cargo_boletim_urna", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"id_cargo_eleicao", "id_boletim_urna"})})
+@Table(
+    name = "apuracao_votos_cargo_boletim_urna",
+    schema = "public",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"id_cargo_eleicao", "id_boletim_urna"})})
 @Getter
 @Setter
 @NoArgsConstructor

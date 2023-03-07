@@ -1,6 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -12,13 +11,15 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder(value = {"id", "boletimUrna", "cabecalho", "conteudo", "hash", "indice", "numeroCiclosEleitoraisDesdeImplementacao", "numeroRevisoesFormatoCiclo", "numeroVersaoChaveAssinatura"})
+@JsonPropertyOrder(value = {
+    "id", "boletimUrna", "cabecalho", "conteudo", "hash", "indice","numeroCiclosEleitoraisDesdeImplementacao",
+    "numeroRevisoesFormatoCiclo", "numeroVersaoChaveAssinatura"
+})
 public class QRCodeBoletimUrnaRetrievalDTO {
 
     private Integer id;
 
-    @JsonProperty(value = "boletimUrna")
-    private BoletimUrnaRetrievalDTO boletimUrnaRetrievalDTO;
+    private BoletimUrnaRetrievalDTO boletimUrna;
 
     private String cabecalho;
 

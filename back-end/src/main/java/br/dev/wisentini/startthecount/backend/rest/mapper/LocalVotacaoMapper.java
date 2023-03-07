@@ -14,13 +14,15 @@ public class LocalVotacaoMapper {
 
     private final ZonaMapper zonaMapper;
 
+    private final MunicipioMapper municipioMapper;
+
     public LocalVotacaoRetrievalDTO toLocalVotacaoRetrievalDTO(LocalVotacao localVotacao) {
         return new LocalVotacaoRetrievalDTO(
             localVotacao.getId(),
             localVotacao.getNumeroTSE(),
             localVotacao.getNome(),
             this.zonaMapper.toZonaRetrievalDTO(localVotacao.getZona()),
-            localVotacao.getMunicipio()
+            this.municipioMapper.toMunicipioRetrievalDTO(localVotacao.getMunicipio())
         );
     }
 

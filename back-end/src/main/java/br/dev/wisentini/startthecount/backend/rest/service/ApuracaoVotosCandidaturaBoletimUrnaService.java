@@ -10,18 +10,24 @@ import br.dev.wisentini.startthecount.backend.rest.repository.ApuracaoVotosCandi
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "apuracao-votos-candidatura-boletim-urna")
 public class ApuracaoVotosCandidaturaBoletimUrnaService {
 
     private final ApuracaoVotosCandidaturaBoletimUrnaRepository apuracaoVotosCandidaturaBoletimUrnaRepository;
 
     private final ApuracaoVotosCandidaturaBoletimUrnaMapper apuracaoVotosCandidaturaBoletimUrnaMapper;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%d:%d:%d:%s:%d', #id.numeroTSECandidato, #id.codigoTSECargo, #id.codigoTSEEleicao, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
     public ApuracaoVotosCandidaturaBoletimUrna findById(ApuracaoVotosCandidaturaBoletimUrnaIdDTO id) {
         return this.apuracaoVotosCandidaturaBoletimUrnaRepository
             .findByCandidaturaCandidatoNumeroTSEAndCandidaturaCargoEleicaoCargoCodigoTSEAndCandidaturaCargoEleicaoEleicaoCodigoTSEAndBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
@@ -34,10 +40,11 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
                 id.getCodigoTSEPleito()
             )
             .orElseThrow(() -> {
-                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma apuração de votos de candidatura de boletim de urna identificada por %s.", id));
+                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma apuração de votos de candidatura por boletim de urna identificada por %s.", id));
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<ApuracaoVotosCandidaturaBoletimUrna> findAll() {
         return this.apuracaoVotosCandidaturaBoletimUrnaRepository.findAll();
     }
@@ -55,6 +62,8 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
             return this.findById(this.apuracaoVotosCandidaturaBoletimUrnaMapper.toApuracaoVotosCandidaturaBoletimUrnaIdDTO(apuracaoVotosCandidaturaBoletimUrna));
         }
 
+        this.cachingService.evictAllCaches();
+
         return this.apuracaoVotosCandidaturaBoletimUrnaRepository.save(apuracaoVotosCandidaturaBoletimUrna);
     }
 
@@ -70,7 +79,7 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         )) {
-            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma apuração de votos de candidatura de boletim de urna identificada por %s.", id));
+            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma apuração de votos de candidatura por boletim de urna identificada por %s.", id));
         }
 
         this.apuracaoVotosCandidaturaBoletimUrnaRepository.deleteByCandidaturaCandidatoNumeroTSEAndCandidaturaCargoEleicaoCargoCodigoTSEAndCandidaturaCargoEleicaoEleicaoCodigoTSEAndBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
@@ -82,6 +91,8 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByCandidatura(CandidaturaIdDTO candidaturaId) {
@@ -92,6 +103,8 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
             candidaturaId.getCodigoTSECargo(),
             candidaturaId.getCodigoTSEEleicao()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByBoletimUrna(BoletimUrnaIdDTO boletimUrnaId) {
@@ -103,5 +116,7 @@ public class ApuracaoVotosCandidaturaBoletimUrnaService {
             boletimUrnaId.getSiglaUF(),
             boletimUrnaId.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 }

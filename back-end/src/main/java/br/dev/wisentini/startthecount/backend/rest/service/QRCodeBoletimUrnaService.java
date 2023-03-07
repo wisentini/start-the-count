@@ -9,18 +9,24 @@ import br.dev.wisentini.startthecount.backend.rest.model.QRCodeBoletimUrna;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "qr-code-boletim-urna")
 public class QRCodeBoletimUrnaService {
 
     private final QRCodeBoletimUrnaRepository qrCodeBoletimUrnaRepository;
 
     private final QRCodeBoletimUrnaMapper qrCodeBoletimUrnaMapper;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%d:%s:%d', #id.indice, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
     public QRCodeBoletimUrna findById(QRCodeBoletimUrnaIdDTO id) {
         return this.qrCodeBoletimUrnaRepository
             .findByIndiceAndBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
@@ -35,19 +41,9 @@ public class QRCodeBoletimUrnaService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<QRCodeBoletimUrna> findAll() {
         return this.qrCodeBoletimUrnaRepository.findAll();
-    }
-
-    public List<QRCodeBoletimUrna> findByBoletimUrna(BoletimUrnaIdDTO id) {
-        id.validate();
-
-        return this.qrCodeBoletimUrnaRepository.findByBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
-            id.getNumeroTSESecao(),
-            id.getNumeroTSEZona(),
-            id.getSiglaUF(),
-            id.getCodigoTSEPleito()
-        );
     }
 
     public QRCodeBoletimUrna getIfExistsOrElseSave(QRCodeBoletimUrna qrCodeBoletimUrna) {
@@ -58,8 +54,10 @@ public class QRCodeBoletimUrnaService {
             qrCodeBoletimUrna.getBoletimUrna().getSecaoPleito().getSecao().getZona().getUF().getSigla(),
             qrCodeBoletimUrna.getBoletimUrna().getSecaoPleito().getPleito().getCodigoTSE()
         )) {
-            return this.findById(this.qrCodeBoletimUrnaMapper.toQrCodeBoletimUrnaIdDTO(qrCodeBoletimUrna));
+            return this.findById(this.qrCodeBoletimUrnaMapper.toQRCodeBoletimUrnaIdDTO(qrCodeBoletimUrna));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.qrCodeBoletimUrnaRepository.save(qrCodeBoletimUrna);
     }
@@ -84,6 +82,8 @@ public class QRCodeBoletimUrnaService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByBoletimUrna(BoletimUrnaIdDTO boletimUrnaId) {
@@ -95,5 +95,7 @@ public class QRCodeBoletimUrnaService {
             boletimUrnaId.getSiglaUF(),
             boletimUrnaId.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 }

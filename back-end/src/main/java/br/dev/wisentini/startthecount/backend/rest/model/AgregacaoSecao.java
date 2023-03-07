@@ -15,7 +15,9 @@ import java.util.Objects;
 @Table(
     name = "agregacao_secao",
     schema = "public",
-    uniqueConstraints = {@UniqueConstraint(columnNames = {"id_secao_principal", "id_secao_agregada", "id_processo_eleitoral"})}
+    uniqueConstraints = {@UniqueConstraint(columnNames = {
+        "id_secao_principal", "id_secao_agregada", "id_processo_eleitoral"
+    })}
 )
 @Getter
 @Setter

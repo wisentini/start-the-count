@@ -1,8 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.Pleito;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -19,8 +16,7 @@ public class SecaoPleitoRetrievalDTO {
 
     private Integer id;
 
-    @JsonProperty(value = "secao")
-    private SecaoRetrievalDTO secaoRetrievalDTO;
+    private SecaoRetrievalDTO secao;
 
-    private Pleito pleito;
+    private PleitoRetrievalDTO pleito;
 }

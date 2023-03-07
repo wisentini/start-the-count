@@ -1,8 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import br.dev.wisentini.startthecount.backend.rest.model.Permissao;
-import br.dev.wisentini.startthecount.backend.rest.model.Papel;
-
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -19,7 +16,7 @@ public class PapelPermissaoRetrievalDTO {
 
     private Integer id;
 
-    private Papel papel;
+    private PapelRetrievalDTO papel;
 
-    private Permissao permissao;
+    private PermissaoRetrievalDTO permissao;
 }

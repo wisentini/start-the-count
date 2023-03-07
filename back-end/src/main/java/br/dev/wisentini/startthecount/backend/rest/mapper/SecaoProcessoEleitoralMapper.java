@@ -12,20 +12,30 @@ import org.springframework.stereotype.Component;
 public class SecaoProcessoEleitoralMapper {
 
     private final LocalVotacaoMapper localVotacaoMapper;
+
     private final SecaoMapper secaoMapper;
 
+    private final ProcessoEleitoralMapper processoEleitoralMapper;
+
     @Autowired
-    public SecaoProcessoEleitoralMapper(@Lazy LocalVotacaoMapper localVotacaoMapper, SecaoMapper secaoMapper) {
+    public SecaoProcessoEleitoralMapper(
+        @Lazy LocalVotacaoMapper localVotacaoMapper,
+        SecaoMapper secaoMapper,
+        ProcessoEleitoralMapper processoEleitoralMapper
+    ) {
         this.localVotacaoMapper = localVotacaoMapper;
         this.secaoMapper = secaoMapper;
+        this.processoEleitoralMapper = processoEleitoralMapper;
     }
 
-    public SecaoProcessoEleitoralRetrievalDTO toSecaoProcessoEleitoralRetrievalDTO(SecaoProcessoEleitoral secaoProcessoEleitoral) {
+    public SecaoProcessoEleitoralRetrievalDTO toSecaoProcessoEleitoralRetrievalDTO(
+        SecaoProcessoEleitoral secaoProcessoEleitoral
+    ) {
         return new SecaoProcessoEleitoralRetrievalDTO(
             secaoProcessoEleitoral.getId(),
-            this.localVotacaoMapper.toLocalVotacaoRetrievalDTO(secaoProcessoEleitoral.getLocalVotacao()),
             this.secaoMapper.toSecaoRetrievalDTO(secaoProcessoEleitoral.getSecao()),
-            secaoProcessoEleitoral.getProcessoEleitoral()
+            this.processoEleitoralMapper.toProcessoEleitoralRetrievalDTO(secaoProcessoEleitoral.getProcessoEleitoral()),
+            this.localVotacaoMapper.toLocalVotacaoRetrievalDTO(secaoProcessoEleitoral.getLocalVotacao())
         );
     }
 

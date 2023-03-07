@@ -1,20 +1,25 @@
 package br.dev.wisentini.startthecount.backend.rest.service;
 
-import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
-import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoMapper;
-import br.dev.wisentini.startthecount.backend.rest.repository.SecaoRepository;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.SecaoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.ZonaIdDTO;
-import br.dev.wisentini.startthecount.backend.rest.model.Secao;
+import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
+import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoMapper;
+import br.dev.wisentini.startthecount.backend.rest.model.*;
+import br.dev.wisentini.startthecount.backend.rest.repository.SecaoRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "secao")
 public class SecaoService {
 
     private final SecaoRepository secaoRepository;
@@ -25,6 +30,11 @@ public class SecaoService {
 
     private final SecaoPleitoService secaoPleitoService;
 
+    private final AgregacaoSecaoService agregacaoSecaoService;
+
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%s', #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF)")
     public Secao findById(SecaoIdDTO id) {
         return this.secaoRepository
             .findByNumeroTSEAndZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(id.getNumeroTSESecao(), id.getNumeroTSEZona(), id.getSiglaUF())
@@ -33,17 +43,49 @@ public class SecaoService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<Secao> findAll() {
         return this.secaoRepository.findAll();
     }
 
-    public List<Secao> findByZona(ZonaIdDTO id) {
-        id.validate();
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF)")
+    public Set<ProcessoEleitoral> findProcessosEleitorais(SecaoIdDTO id) {
+        return this
+            .findById(id)
+            .getProcessosEleitorais()
+            .stream()
+            .map(SecaoProcessoEleitoral::getProcessoEleitoral)
+            .collect(Collectors.toSet());
+    }
 
-        return this.secaoRepository.findByZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(
-            id.getNumeroTSEZona(),
-            id.getSiglaUF()
-        );
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF)")
+    public Set<Pleito> findPleitos(SecaoIdDTO id) {
+        return this
+            .findById(id)
+            .getPleitos()
+            .stream()
+            .map(SecaoPleito::getPleito)
+            .collect(Collectors.toSet());
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF)")
+    public Set<Secao> findSecoesPrincipais(SecaoIdDTO id) {
+        return this
+            .findById(id)
+            .getSecoesPrincipais()
+            .stream()
+            .map(AgregacaoSecao::getSecaoPrincipal)
+            .collect(Collectors.toSet());
+    }
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s', #root.methodName, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF)")
+    public Set<Secao> findSecoesAgregadas(SecaoIdDTO id) {
+        return this
+            .findById(id)
+            .getSecoesAgregadas()
+            .stream()
+            .map(AgregacaoSecao::getSecaoAgregada)
+            .collect(Collectors.toSet());
     }
 
     public Secao getIfExistsOrElseSave(Secao secao) {
@@ -54,6 +96,8 @@ public class SecaoService {
         )) {
             return this.findById(this.secaoMapper.toSecaoIdDTO(secao));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.secaoRepository.save(secao);
     }
@@ -67,12 +111,16 @@ public class SecaoService {
 
         this.secaoProcessoEleitoralService.deleteBySecao(id);
         this.secaoPleitoService.deleteBySecao(id);
+        this.agregacaoSecaoService.deleteBySecaoAgregada(id);
+        this.agregacaoSecaoService.deleteBySecaoPrincipal(id);
 
         this.secaoRepository.deleteByNumeroTSEAndZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(
             id.getNumeroTSESecao(),
             id.getNumeroTSEZona(),
             id.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByZona(ZonaIdDTO zonaId) {
@@ -85,11 +133,15 @@ public class SecaoService {
 
                 this.secaoProcessoEleitoralService.deleteBySecao(id);
                 this.secaoPleitoService.deleteBySecao(id);
+                this.agregacaoSecaoService.deleteBySecaoAgregada(id);
+                this.agregacaoSecaoService.deleteBySecaoPrincipal(id);
             });
 
         this.secaoRepository.deleteByZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(
             zonaId.getNumeroTSEZona(),
             zonaId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 }

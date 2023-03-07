@@ -73,7 +73,7 @@ DROP TABLE IF EXISTS permissao;
 
 CREATE TABLE IF NOT EXISTS papel (
     id_papel  INT         NOT NULL GENERATED ALWAYS AS IDENTITY,
-    nome      VARCHAR(15)  NOT NULL,
+    nome      VARCHAR(15) NOT NULL,
     descricao VARCHAR(31) NOT NULL,
 
     PRIMARY KEY (id_papel),
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS papel (
 
 CREATE TABLE IF NOT EXISTS permissao (
     id_permissao INT         NOT NULL GENERATED ALWAYS AS IDENTITY,
-    nome         VARCHAR(31)  NOT NULL,
+    nome         VARCHAR(31) NOT NULL,
     descricao    VARCHAR(63) NOT NULL,
 
     PRIMARY KEY (id_permissao),

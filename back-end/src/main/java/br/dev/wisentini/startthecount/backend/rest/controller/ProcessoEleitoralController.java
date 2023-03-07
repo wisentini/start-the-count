@@ -1,15 +1,14 @@
 package br.dev.wisentini.startthecount.backend.rest.controller;
 
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.AgregacaoSecaoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.PleitoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.ProcessoEleitoralRetrievalDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.SecaoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.mapper.AgregacaoSecaoMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.PleitoMapper;
+import br.dev.wisentini.startthecount.backend.rest.mapper.ProcessoEleitoralMapper;
 import br.dev.wisentini.startthecount.backend.rest.mapper.SecaoMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.ProcessoEleitoral;
 import br.dev.wisentini.startthecount.backend.rest.service.ProcessoEleitoralService;
-
-import br.dev.wisentini.startthecount.backend.rest.service.SecaoProcessoEleitoralService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,49 +16,68 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/processos-eleitorais")
+@RequestMapping(value = "/api/processos-eleitorais")
 @RequiredArgsConstructor
-@Tag(name = "processos-eleitorais")
-@SecurityRequirement(name = "bearerAuth")
 public class ProcessoEleitoralController {
 
     private final ProcessoEleitoralService processoEleitoralService;
 
-    private final SecaoProcessoEleitoralService secaoProcessoEleitoralService;
+    private final ProcessoEleitoralMapper processoEleitoralMapper;
+
+    private final PleitoMapper pleitoMapper;
 
     private final SecaoMapper secaoMapper;
 
-    @Operation(summary = "Encontra um processo eleitoral.", description = "Encontra um processo eleitoral.")
+    private final AgregacaoSecaoMapper agregacaoSecaoMapper;
+
     @GetMapping(value = "/{codigoTSE}")
     @ResponseStatus(value = HttpStatus.OK)
-    public ProcessoEleitoral findProcessoEleitoral(
-        @Parameter(description = "O código do processo eleitoral que deve ser encontrado.")
-        @PathVariable("codigoTSE") int codigoTSE
-    ) {
-        return this.processoEleitoralService.findByCodigoTSE(codigoTSE);
+    public ProcessoEleitoralRetrievalDTO findProcessoEleitoral(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.processoEleitoralMapper
+            .toProcessoEleitoralRetrievalDTO(this.processoEleitoralService.findByCodigoTSE(codigoTSE));
     }
 
-    @Operation(summary = "Encontra todos os processos eleitorais.", description = "Encontra todos os processos eleitorais.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<ProcessoEleitoral> findProcessosEleitorais() {
-        return this.processoEleitoralService.findAll();
+    public List<ProcessoEleitoralRetrievalDTO> findProcessosEleitorais() {
+        return this.processoEleitoralService
+            .findAll()
+            .stream()
+            .map(this.processoEleitoralMapper::toProcessoEleitoralRetrievalDTO)
+            .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Encontra todas as seções de um processo eleitoral.", description = "Encontra todas as seções de um processo eleitoral.")
     @GetMapping(value = "/{codigoTSE}/secoes")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<SecaoRetrievalDTO> findSecoes(
-        @Parameter(description = "O código do processoEleitoral.")
-        @PathVariable("codigoTSE") int codigoTSE
-    ) {
-        return this.secaoProcessoEleitoralService
-            .findSecoesByProcessoEleitoral(codigoTSE)
+    public Set<SecaoRetrievalDTO> findSecoes(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.processoEleitoralService
+            .findSecoes(codigoTSE)
             .stream()
             .map(this.secaoMapper::toSecaoRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/{codigoTSE}/agregacoes-secao")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<AgregacaoSecaoRetrievalDTO> findAgregacoesSecao(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.processoEleitoralService
+            .findSecoesAgregadas(codigoTSE)
+            .stream()
+            .map(this.agregacaoSecaoMapper::toAgregacaoSecaoRetrievalDTO)
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/{codigoTSE}/pleitos")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<PleitoRetrievalDTO> findPleitos(@PathVariable("codigoTSE") Integer codigoTSE) {
+        return this.processoEleitoralService
+            .findPleitos(codigoTSE)
+            .stream()
+            .map(this.pleitoMapper::toPleitoRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

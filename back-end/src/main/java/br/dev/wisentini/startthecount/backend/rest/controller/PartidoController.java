@@ -1,14 +1,12 @@
 package br.dev.wisentini.startthecount.backend.rest.controller;
 
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.ApuracaoVotosPartidoBoletimUrnaRetrievalDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.CandidaturaRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.PartidoRetrievalDTO;
+import br.dev.wisentini.startthecount.backend.rest.mapper.ApuracaoVotosPartidoBoletimUrnaMapper;
 import br.dev.wisentini.startthecount.backend.rest.mapper.CandidaturaMapper;
-import br.dev.wisentini.startthecount.backend.rest.model.Partido;
+import br.dev.wisentini.startthecount.backend.rest.mapper.PartidoMapper;
 import br.dev.wisentini.startthecount.backend.rest.service.PartidoService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,47 +14,57 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/partidos")
+@RequestMapping(value = "/api/partidos")
 @RequiredArgsConstructor
-@Tag(name = "partidos")
-@SecurityRequirement(name = "bearerAuth")
 public class PartidoController {
 
     private final PartidoService partidoService;
 
+    private final PartidoMapper partidoMapper;
+
     private final CandidaturaMapper candidaturaMapper;
 
-    @Operation(summary = "Encontra um partido.", description = "Encontra um partido.")
+    private final ApuracaoVotosPartidoBoletimUrnaMapper apuracaoVotosPartidoBoletimUrnaMapper;
+
     @GetMapping(value = "/{numeroTSE}")
     @ResponseStatus(value = HttpStatus.OK)
-    public Partido findPartido(
-        @Parameter(description = "O número do partido.")
-        @PathVariable("numeroTSE") int numeroTSE
-    ) {
-        return this.partidoService.findByNumeroTSE(numeroTSE);
+    public PartidoRetrievalDTO findPartido(@PathVariable("numeroTSE") Integer numeroTSE) {
+        return this.partidoMapper.toPartidoRetrievalDTO(this.partidoService.findByNumeroTSE(numeroTSE));
     }
 
-    @Operation(summary = "Encontra todos os partidos.", description = "Encontra todos os partidos.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
-    public List<Partido> findPartidos() {
-        return this.partidoService.findAll();
+    public List<PartidoRetrievalDTO> findPartidos() {
+        return this.partidoService
+            .findAll()
+            .stream()
+            .map(this.partidoMapper::toPartidoRetrievalDTO)
+            .collect(Collectors.toList());
     }
 
-    @Operation(summary = "Encontra todas as candidaturas de um partido.", description = "Encontra todas as candidaturas de um partido.")
     @GetMapping(value = "/{numeroTSE}/candidaturas")
     @ResponseStatus(value = HttpStatus.OK)
-    public List<CandidaturaRetrievalDTO> findCandidaturas(
-        @Parameter(description = "O número do partido.")
-        @PathVariable("numeroTSE") int numeroTSE
-    ) {
+    public Set<CandidaturaRetrievalDTO> findCandidaturas(@PathVariable("numeroTSE") Integer numeroTSE) {
         return this.partidoService
             .findCandidaturas(numeroTSE)
             .stream()
             .map(this.candidaturaMapper::toCandidaturaRetrievalDTO)
-            .collect(Collectors.toList());
+            .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/{numeroTSE}/apuracoes-votos-boletim-urna")
+    @ResponseStatus(value = HttpStatus.OK)
+    public Set<ApuracaoVotosPartidoBoletimUrnaRetrievalDTO> findApuracoesVotosBoletimUrna(
+        @PathVariable("numeroTSE") Integer numeroTSE
+    ) {
+        return this.partidoService
+            .findApuracoesVotosBoletimUrna(numeroTSE)
+            .stream()
+            .map(this.apuracaoVotosPartidoBoletimUrnaMapper::toApuracaoVotosPartidoBoletimUrnaRetrievalDTO)
+            .collect(Collectors.toSet());
     }
 }

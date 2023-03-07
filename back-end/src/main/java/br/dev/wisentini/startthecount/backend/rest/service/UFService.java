@@ -8,20 +8,21 @@ import br.dev.wisentini.startthecount.backend.rest.repository.UFRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "uf")
 public class UFService {
 
     private final UFRepository ufRepository;
 
-    private final MunicipioService municipioService;
-
-    private final ZonaService zonaService;
-
+    @Cacheable(key = "#sigla")
     public UF findBySigla(String sigla) {
         return this.ufRepository
             .findBySiglaEqualsIgnoreCase(sigla)
@@ -30,19 +31,18 @@ public class UFService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<UF> findAll() {
         return this.ufRepository.findAll();
     }
 
-    public List<UF> findByRegiao(String siglaRegiao) {
-        return this.ufRepository.findByRegiaoSiglaEqualsIgnoreCase(siglaRegiao);
+    @Cacheable(key = "T(java.lang.String).format('%s:%s', #root.methodName, #sigla)")
+    public Set<Municipio> findMunicipios(String sigla) {
+        return this.findBySigla(sigla).getMunicipios();
     }
 
-    public List<Municipio> findMunicipios(String sigla) {
-        return this.municipioService.findByUF(sigla);
-    }
-
-    public List<Zona> findZonas(String sigla) {
-        return this.zonaService.findByUF(sigla);
+    @Cacheable(key = "T(java.lang.String).format('%s:%s', #root.methodName, #sigla)")
+    public Set<Zona> findZonas(String sigla) {
+        return this.findBySigla(sigla).getZonas();
     }
 }

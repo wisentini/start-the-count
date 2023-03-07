@@ -9,18 +9,24 @@ import br.dev.wisentini.startthecount.backend.rest.repository.AgregacaoSecaoRepo
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "eleicao")
 public class AgregacaoSecaoService {
 
     private final AgregacaoSecaoRepository agregacaoSecaoRepository;
 
     private final AgregacaoSecaoMapper agregacaoSecaoMapper;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%s:%d:%d:%s:%d', #id.numeroTSESecaoPrincipal, #id.numeroTSEZonaSecaoPrincipal, #id.siglaUFSecaoPrincipal, #id.numeroTSESecaoAgregada, #id.numeroTSEZonaSecaoAgregada, #id.siglaUFSecaoAgregada, #id.codigoTSEProcessoEleitoral)")
     public AgregacaoSecao findById(AgregacaoSecaoIdDTO id) {
         return this.agregacaoSecaoRepository
             .findBySecaoPrincipalNumeroTSEAndSecaoPrincipalZonaNumeroTSEAndSecaoPrincipalZonaUfSiglaEqualsIgnoreCaseAndSecaoAgregadaNumeroTSEAndSecaoAgregadaZonaNumeroTSEAndSecaoAgregadaZonaUfSiglaEqualsIgnoreCaseAndProcessoEleitoralCodigoTSE(
@@ -37,6 +43,7 @@ public class AgregacaoSecaoService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<AgregacaoSecao> findAll() {
         return this.agregacaoSecaoRepository.findAll();
     }
@@ -53,6 +60,8 @@ public class AgregacaoSecaoService {
         )) {
             return this.findById(this.agregacaoSecaoMapper.toAgregacaoSecaoIdDTO(agregacaoSecao));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.agregacaoSecaoRepository.save(agregacaoSecao);
     }
@@ -81,6 +90,8 @@ public class AgregacaoSecaoService {
             id.getSiglaUFSecaoAgregada(),
             id.getCodigoTSEProcessoEleitoral()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteBySecaoPrincipal(SecaoIdDTO secaoPrincipalId) {
@@ -91,6 +102,8 @@ public class AgregacaoSecaoService {
             secaoPrincipalId.getNumeroTSEZona(),
             secaoPrincipalId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteBySecaoAgregada(SecaoIdDTO secaoAgregadaId) {
@@ -101,9 +114,13 @@ public class AgregacaoSecaoService {
             secaoAgregadaId.getNumeroTSEZona(),
             secaoAgregadaId.getSiglaUF()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByProcessoEleitoral(int codigoTSEProcessoEleitoral) {
         this.agregacaoSecaoRepository.deleteByProcessoEleitoralCodigoTSE(codigoTSEProcessoEleitoral);
+
+        this.cachingService.evictAllCaches();
     }
 }

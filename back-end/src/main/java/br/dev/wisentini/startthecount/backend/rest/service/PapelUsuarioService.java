@@ -3,23 +3,27 @@ package br.dev.wisentini.startthecount.backend.rest.service;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.PapelUsuarioIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeJaExisteException;
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
-import br.dev.wisentini.startthecount.backend.rest.model.Papel;
 import br.dev.wisentini.startthecount.backend.rest.model.PapelUsuario;
-import br.dev.wisentini.startthecount.backend.rest.model.Usuario;
 import br.dev.wisentini.startthecount.backend.rest.repository.PapelUsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@CacheConfig(cacheNames = "papel-usuario")
 public class PapelUsuarioService {
 
     private final PapelUsuarioRepository papelUsuarioRepository;
 
+    private final CachingService cachingService;
+
+    @Cacheable(key = "T(java.lang.String).format('%s:%s', #id.username, #id.nomePapel)")
     public PapelUsuario findById(PapelUsuarioIdDTO id) {
         return this.papelUsuarioRepository
             .findByUsuarioUsernameEqualsIgnoreCaseAndPapelNomeEqualsIgnoreCase(
@@ -31,6 +35,7 @@ public class PapelUsuarioService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<PapelUsuario> findAll() {
         return this.papelUsuarioRepository.findAll();
     }
@@ -44,14 +49,8 @@ public class PapelUsuarioService {
         }
 
         this.papelUsuarioRepository.save(papelUsuario);
-    }
 
-    public List<Usuario> findUsuariosByPapel(String nomePapel) {
-        return this.papelUsuarioRepository.findUsuariosByPapel(nomePapel);
-    }
-
-    public List<Papel> findPapeisByUsuario(String username) {
-        return this.papelUsuarioRepository.findPapeisByUsuario(username);
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteById(PapelUsuarioIdDTO id) {
@@ -66,5 +65,13 @@ public class PapelUsuarioService {
             id.getUsername(),
             id.getNomePapel()
         );
+
+        this.cachingService.evictAllCaches();
+    }
+
+    public void deleteByUsuario(String username) {
+        this.papelUsuarioRepository.deleteByUsuarioUsernameEqualsIgnoreCase(username);
+
+        this.cachingService.evictAllCaches();
     }
 }

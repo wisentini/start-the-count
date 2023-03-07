@@ -38,6 +38,14 @@ public class BoletimUrna {
         this.complementoBoletimUrnaCacheService = new ComplementoBoletimUrnaCachingService();
     }
 
+    public List<QRCodeBoletimUrna> getQRCodes() {
+        return this.qrCodes;
+    }
+
+    public void setQRCodes(List<QRCodeBoletimUrna> qrCodes) {
+        this.qrCodes = qrCodes;
+    }
+
     public void addQRCode(QRCodeBoletimUrna qrCode) {
         this.qrCodes.add(qrCode);
     }
@@ -98,7 +106,7 @@ public class BoletimUrna {
     private String comporURLChavePublicaVerificacaoAssinatura() throws DadosFaltantesException {
         this.validarDadosURLChavePublicaVerificacaoAssinatura();
 
-        Integer versaoChaveAssinaturaQRCode = this.getQrCodes().get(0).getCabecalho().getVersaoChaveAssinatura();
+        Integer versaoChaveAssinaturaQRCode = this.getQRCodes().get(0).getCabecalho().getVersaoChaveAssinatura();
         String origem = this.conteudo.getProcessoEleitoral().getOrigemConfiguracao().toStringURLVerificacaoAssinatura();
         String fase = this.conteudo.getFase().getNomeAbreviado().toLowerCase();
         String UF = this.conteudo.getUF().getSigla().toLowerCase();

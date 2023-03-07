@@ -33,10 +33,8 @@ import br.dev.wisentini.startthecount.backend.rest.model.Zona;
 import br.dev.wisentini.startthecount.backend.rest.model.*;
 import br.dev.wisentini.startthecount.backend.rest.repository.BoletimUrnaUsuarioRepository;
 import br.dev.wisentini.startthecount.backend.util.StringUtil;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -101,6 +99,8 @@ public class BoletimUrnaUsuarioService {
 
     private final AgregacaoSecaoService agregacaoSecaoService;
 
+    private final CachingService cachingService;
+
     @Autowired
     public BoletimUrnaUsuarioService(
         UFService ufService,
@@ -129,7 +129,8 @@ public class BoletimUrnaUsuarioService {
         ApuracaoVotosPartidoBoletimUrnaService apuracaoVotosPartidoBoletimUrnaService,
         BoletimUrnaService boletimUrnaService,
         BoletimUrnaUsuarioRepository boletimUrnaUsuarioRepository,
-        AgregacaoSecaoService agregacaoSecaoService
+        AgregacaoSecaoService agregacaoSecaoService,
+        CachingService cachingService
     ) {
         this.ufService = ufService;
         this.urnaEletronicaService = urnaEletronicaService;
@@ -158,6 +159,7 @@ public class BoletimUrnaUsuarioService {
         this.boletimUrnaService = boletimUrnaService;
         this.boletimUrnaUsuarioRepository = boletimUrnaUsuarioRepository;
         this.agregacaoSecaoService = agregacaoSecaoService;
+        this.cachingService = cachingService;
     }
 
     @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s:%d', #id.username, #id.numeroTSESecao, #id.numeroTSEZona, #id.siglaUF, #id.codigoTSEPleito)")
@@ -171,23 +173,8 @@ public class BoletimUrnaUsuarioService {
                 id.getCodigoTSEPleito()
             )
             .orElseThrow(() -> {
-                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de BoletimUrnaUsuario identificada por %s.", id));
+                throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre boletim de urna e usuário identificada por %s.", id));
             });
-    }
-
-    @Cacheable(key = "#root.methodName")
-    public List<BoletimUrna> findBoletinsUrnaByUsuario(String username) {
-        return this.boletimUrnaUsuarioRepository.findBoletinsUrnaByUsuario(username);
-    }
-
-    @Cacheable(key = "#root.methodName")
-    public List<Usuario> findUsuariosByBoletimUrna(BoletimUrnaIdDTO id) {
-        return this.boletimUrnaUsuarioRepository.findUsuariosByBoletimUrna(
-            id.getNumeroTSESecao(),
-            id.getNumeroTSEZona(),
-            id.getSiglaUF(),
-            id.getCodigoTSEPleito()
-        );
     }
 
     @Cacheable(key = "#root.methodName")
@@ -195,8 +182,7 @@ public class BoletimUrnaUsuarioService {
         return this.boletimUrnaUsuarioRepository.findAll();
     }
 
-    @CacheEvict(allEntries = true)
-    public BoletimUrnaUsuario getIfExistsOrElseSave(BoletimUrnaUsuario boletimUrnaUsuario) {
+    public BoletimUrnaUsuario saveIfNotExists(BoletimUrnaUsuario boletimUrnaUsuario) {
         if (this.boletimUrnaUsuarioRepository.existsByUsuarioUsernameEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
             boletimUrnaUsuario.getUsuario().getUsername(),
             boletimUrnaUsuario.getBoletimUrna().getSecaoPleito().getSecao().getNumeroTSE(),
@@ -216,10 +202,11 @@ public class BoletimUrnaUsuarioService {
             );
         }
 
+        this.cachingService.evictAllCaches();
+
         return this.boletimUrnaUsuarioRepository.save(boletimUrnaUsuario);
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteById(BoletimUrnaUsuarioIdDTO id) {
         id.validate();
 
@@ -230,7 +217,7 @@ public class BoletimUrnaUsuarioService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         )) {
-            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma instância de BoletimUrnaUsuario identificada por %s.", id));
+            throw new EntidadeNaoEncontradaException(String.format("Não foi encontrada nenhuma relação entre boletim de urna e usuário identificada por %s.", id));
         }
 
         this.boletimUrnaUsuarioRepository.deleteByUsuarioUsernameEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoSecaoNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaNumeroTSEAndBoletimUrnaSecaoPleitoSecaoZonaUfSiglaEqualsIgnoreCaseAndBoletimUrnaSecaoPleitoPleitoCodigoTSE(
@@ -240,9 +227,10 @@ public class BoletimUrnaUsuarioService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
-    @CacheEvict(allEntries = true)
     public void deleteByBoletimUrna(BoletimUrnaIdDTO id) {
         id.validate();
 
@@ -252,10 +240,14 @@ public class BoletimUrnaUsuarioService {
             id.getSiglaUF(),
             id.getCodigoTSEPleito()
         );
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByUsuario(String username) {
         this.boletimUrnaUsuarioRepository.deleteByUsuarioUsernameEqualsIgnoreCase(username);
+
+        this.cachingService.evictAllCaches();
     }
 
     public void build(BoletimUrnaBuildDTO boletimUrnaBuildDTO, Usuario usuario) {
@@ -495,12 +487,12 @@ public class BoletimUrnaUsuarioService {
             Objects.isNull(emissaoBoletimUrna) ? null : emissaoBoletimUrna.getHorario()
         ));
 
-        BoletimUrnaUsuario boletimUrnaUsuario = this.getIfExistsOrElseSave(new BoletimUrnaUsuario(
+        BoletimUrnaUsuario boletimUrnaUsuario = this.saveIfNotExists(new BoletimUrnaUsuario(
             boletimUrna,
             usuario
         ));
 
-        for (br.dev.wisentini.startthecount.backend.core.model.QRCodeBoletimUrna qrCodeBoletimUrna : boletimUrnaQRCode.getQrCodes()) {
+        for (br.dev.wisentini.startthecount.backend.core.model.QRCodeBoletimUrna qrCodeBoletimUrna : boletimUrnaQRCode.getQRCodes()) {
             this.qrCodeBoletimUrnaService.getIfExistsOrElseSave(new QRCodeBoletimUrna(
                 boletimUrna,
                 qrCodeBoletimUrna.getPayloadCabecalho(),

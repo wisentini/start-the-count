@@ -27,7 +27,7 @@ public class ProcessoEleitoral implements Serializable {
     @Column(name = "cod_tse_processo_eleitoral", unique = true, nullable = false)
     private Integer codigoTSE;
 
-    @Column(name = "nome")
+    @Column(name = "nome", length = 63)
     private String nome;
 
     @ManyToOne(cascade = CascadeType.REFRESH)

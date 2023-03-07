@@ -13,7 +13,10 @@ import java.util.Objects;
 import java.util.Set;
 
 @Entity(name = "Secao")
-@Table(name = "secao", schema = "public", uniqueConstraints = {@UniqueConstraint(columnNames = {"num_tse_secao", "id_zona"})})
+@Table(
+    name = "secao",
+    schema = "public",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"num_tse_secao", "id_zona"})})
 @Getter
 @Setter
 @ToString(doNotUseGetters = true)

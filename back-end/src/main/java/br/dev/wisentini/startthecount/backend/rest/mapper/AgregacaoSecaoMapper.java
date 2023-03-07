@@ -14,12 +14,14 @@ public class AgregacaoSecaoMapper {
 
     private final SecaoMapper secaoMapper;
 
+    private final ProcessoEleitoralMapper processoEleitoralMapper;
+
     public AgregacaoSecaoRetrievalDTO toAgregacaoSecaoRetrievalDTO(AgregacaoSecao agregacaoSecao) {
         return new AgregacaoSecaoRetrievalDTO(
             agregacaoSecao.getId(),
             this.secaoMapper.toSecaoRetrievalDTO(agregacaoSecao.getSecaoPrincipal()),
             this.secaoMapper.toSecaoRetrievalDTO(agregacaoSecao.getSecaoAgregada()),
-            agregacaoSecao.getProcessoEleitoral()
+            this.processoEleitoralMapper.toProcessoEleitoralRetrievalDTO(agregacaoSecao.getProcessoEleitoral())
         );
     }
 

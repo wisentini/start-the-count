@@ -1,6 +1,5 @@
 package br.dev.wisentini.startthecount.backend.rest.dto.retrieval;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import lombok.AllArgsConstructor;
@@ -12,16 +11,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonPropertyOrder(value = {"id", "cargo", "boletimUrna", "quantidadeEleitoresAptos", "quantidadeComparecimentoCargoSemCandidatos", "quantidadeVotosNominais", "quantidadeVotosDeLegenda", "quantidadeVotosEmBranco", "quantidadeVotosNulos", "totalVotosApurados"})
+@JsonPropertyOrder(value = {
+    "id", "cargoEleicao", "boletimUrna", "quantidadeEleitoresAptos",
+    "quantidadeComparecimentoCargoSemCandidatos", "quantidadeVotosNominais",
+    "quantidadeVotosDeLegenda", "quantidadeVotosEmBranco", "quantidadeVotosNulos", "totalVotosApurados"
+})
 public class ApuracaoVotosCargoBoletimUrnaRetrievalDTO {
 
     private Integer id;
 
-    @JsonProperty(value = "cargo")
-    private CargoEleicaoRetrievalDTO cargoEleicaoRetrievalDTO;
+    private CargoEleicaoRetrievalDTO cargoEleicao;
 
-    @JsonProperty(value = "boletimUrna")
-    private BoletimUrnaRetrievalDTO boletimUrnaRetrievalDTO;
+    private BoletimUrnaRetrievalDTO boletimUrna;
 
     private Integer quantidadeEleitoresAptos;
 

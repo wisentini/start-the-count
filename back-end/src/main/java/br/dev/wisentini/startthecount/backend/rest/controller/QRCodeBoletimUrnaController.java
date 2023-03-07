@@ -5,43 +5,34 @@ import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.QRCodeBoletimUr
 import br.dev.wisentini.startthecount.backend.rest.mapper.QRCodeBoletimUrnaMapper;
 import br.dev.wisentini.startthecount.backend.rest.service.QRCodeBoletimUrnaService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/qr-codes-boletim-urna")
+@RequestMapping(value = "/api/qr-codes-boletim-urna")
 @RequiredArgsConstructor
-@Tag(name = "qr-codes-boletim-urna")
-@SecurityRequirement(name = "bearerAuth")
 public class QRCodeBoletimUrnaController {
 
     private final QRCodeBoletimUrnaService qrCodeBoletimUrnaService;
 
     private final QRCodeBoletimUrnaMapper qrCodeBoletimUrnaMapper;
 
-    @Operation(summary = "Encontra um QR code de boletim de urna.", description = "Encontra um QR code de boletim de urna.")
-    @GetMapping(value = "/id")
+    @GetMapping(params = {"indice", "numeroTSESecao", "numeroTSEZona", "siglaUF", "codigoTSEPleito"})
     @ResponseStatus(value = HttpStatus.OK)
-    public QRCodeBoletimUrnaRetrievalDTO findQRCodeBoletimUrna(
-        @Parameter(description = "Os dados que identificam um QR code de boletim de urna.")
-        @Valid QRCodeBoletimUrnaIdDTO id
-    ) {
+    public QRCodeBoletimUrnaRetrievalDTO findQRCodeBoletimUrna(@Valid QRCodeBoletimUrnaIdDTO id) {
         return this.qrCodeBoletimUrnaMapper.toQRCodeBoletimUrnaRetrievalDTO(this.qrCodeBoletimUrnaService.findById(id));
     }
 
-    @Operation(summary = "Encontra todos os QR codes de boletim de urna.", description = "Encontra todos os QR codes de boletim de urna.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<QRCodeBoletimUrnaRetrievalDTO> findQRCodesBoletimUrna() {

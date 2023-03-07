@@ -1,7 +1,9 @@
 package br.dev.wisentini.startthecount.backend.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -24,10 +26,10 @@ public class OrigemConfiguracaoProcessoEleitoral implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "nome", unique = true, nullable = false)
+    @Column(name = "nome", unique = true, nullable = false, length = 31)
     private String nome;
 
-    @Column(name = "nome_abreviado", unique = true)
+    @Column(name = "nome_abreviado", unique = true, length = 3, columnDefinition = "bpchar")
     private String nomeAbreviado;
 
     @OneToMany(mappedBy = "origemConfiguracao", cascade = CascadeType.REFRESH, orphanRemoval = true)

@@ -1,6 +1,8 @@
 package br.dev.wisentini.startthecount.backend.rest.service;
 
 import br.dev.wisentini.startthecount.backend.rest.exception.EntidadeNaoEncontradaException;
+import br.dev.wisentini.startthecount.backend.rest.model.Secao;
+import br.dev.wisentini.startthecount.backend.rest.model.SecaoProcessoEleitoral;
 import br.dev.wisentini.startthecount.backend.rest.repository.LocalVotacaoRepository;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.LocalVotacaoIdDTO;
 import br.dev.wisentini.startthecount.backend.rest.dto.id.ZonaIdDTO;
@@ -8,12 +10,17 @@ import br.dev.wisentini.startthecount.backend.rest.mapper.LocalVotacaoMapper;
 import br.dev.wisentini.startthecount.backend.rest.model.LocalVotacao;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
+@CacheConfig(cacheNames = "local-votacao")
 public class LocalVotacaoService {
 
     private final LocalVotacaoRepository localVotacaoRepository;
@@ -22,13 +29,22 @@ public class LocalVotacaoService {
 
     private final SecaoProcessoEleitoralService secaoProcessoEleitoralService;
 
+    private final CachingService cachingService;
+
     @Autowired
-    public LocalVotacaoService(LocalVotacaoRepository localVotacaoRepository, @Lazy LocalVotacaoMapper localVotacaoMapper, SecaoProcessoEleitoralService secaoProcessoEleitoralService) {
+    public LocalVotacaoService(
+        LocalVotacaoRepository localVotacaoRepository,
+        @Lazy LocalVotacaoMapper localVotacaoMapper,
+        SecaoProcessoEleitoralService secaoProcessoEleitoralService,
+        CachingService cachingService
+    ) {
         this.localVotacaoRepository = localVotacaoRepository;
         this.localVotacaoMapper = localVotacaoMapper;
         this.secaoProcessoEleitoralService = secaoProcessoEleitoralService;
+        this.cachingService = cachingService;
     }
 
+    @Cacheable(key = "T(java.lang.String).format('%d:%d:%s', #id.numeroTSELocalVotacao, #id.numeroTSEZona, #id.siglaUF)")
     public LocalVotacao findById(LocalVotacaoIdDTO id) {
         id.validate();
 
@@ -39,21 +55,18 @@ public class LocalVotacaoService {
             });
     }
 
+    @Cacheable(key = "#root.methodName")
     public List<LocalVotacao> findAll() {
         return this.localVotacaoRepository.findAll();
     }
-
-    public List<LocalVotacao> findByMunicipio(Integer codigoTSEMunicipio) {
-        return this.localVotacaoRepository.findByMunicipioCodigoTSE(codigoTSEMunicipio);
-    }
-
-    public List<LocalVotacao> findByZona(ZonaIdDTO id) {
-        id.validate();
-
-        return this.localVotacaoRepository.findByZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(
-            id.getNumeroTSEZona(),
-            id.getSiglaUF()
-        );
+    @Cacheable(key = "T(java.lang.String).format('%s:%d:%d:%s', #root.methodName, #id.numeroTSELocalVotacao, #id.numeroTSEZona, #id.siglaUF)")
+    public Set<Secao> findSecoes(LocalVotacaoIdDTO id) {
+        return this
+            .findById(id)
+            .getSecoes()
+            .stream()
+            .map(SecaoProcessoEleitoral::getSecao)
+            .collect(Collectors.toSet());
     }
 
     public LocalVotacao getIfExistsOrElseSave(LocalVotacao localVotacao) {
@@ -64,6 +77,8 @@ public class LocalVotacaoService {
         )) {
             return this.findById(this.localVotacaoMapper.toLocalVotacaoIdDTO(localVotacao));
         }
+
+        this.cachingService.evictAllCaches();
 
         return this.localVotacaoRepository.save(localVotacao);
     }
@@ -78,6 +93,8 @@ public class LocalVotacaoService {
         this.secaoProcessoEleitoralService.deleteByLocalVotacao(id);
 
         this.localVotacaoRepository.deleteByNumeroTSEAndZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(id.getNumeroTSELocalVotacao(), id.getNumeroTSEZona(), id.getSiglaUF());
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByZona(ZonaIdDTO zonaId) {
@@ -90,6 +107,8 @@ public class LocalVotacaoService {
             ));
 
         this.localVotacaoRepository.deleteByZonaNumeroTSEAndZonaUfSiglaEqualsIgnoreCase(zonaId.getNumeroTSEZona(), zonaId.getSiglaUF());
+
+        this.cachingService.evictAllCaches();
     }
 
     public void deleteByMunicipio(int codigoTSEMunicipio) {
@@ -100,5 +119,7 @@ public class LocalVotacaoService {
             ));
 
         this.localVotacaoRepository.deleteByMunicipioCodigoTSE(codigoTSEMunicipio);
+
+        this.cachingService.evictAllCaches();
     }
 }

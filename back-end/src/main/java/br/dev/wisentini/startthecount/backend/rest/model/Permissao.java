@@ -33,10 +33,10 @@ public class Permissao implements Serializable {
     @OneToMany(mappedBy = "permissao", cascade = CascadeType.REFRESH, orphanRemoval = true)
     @JsonIgnore
     @ToString.Exclude
-    private Set<PapelPermissao> tiposUsuario;
+    private Set<PapelPermissao> papeis;
 
     public Permissao() {
-        this.tiposUsuario = new LinkedHashSet<>();
+        this.papeis = new LinkedHashSet<>();
     }
 
     @Override

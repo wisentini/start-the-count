@@ -5,11 +5,6 @@ import br.dev.wisentini.startthecount.backend.rest.dto.retrieval.PapelPermissaoR
 import br.dev.wisentini.startthecount.backend.rest.mapper.PapelPermissaoMapper;
 import br.dev.wisentini.startthecount.backend.rest.service.PapelPermissaoService;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -24,27 +19,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping(value = "/papeis-permissoes")
+@RequestMapping(value = "/api/papeis-permissoes")
 @RequiredArgsConstructor
-@Tag(name = "papeis-permissoes")
-@SecurityRequirement(name = "bearerAuth")
 public class PapelPermissaoController {
 
     private final PapelPermissaoService papelPermissaoService;
 
     private final PapelPermissaoMapper papelPermissaoMapper;
 
-    @Operation(summary = "Encontra uma relação entre papel e permissão.", description = "Encontra uma relação entre papel e permissão.")
-    @GetMapping(value = "/id")
+    @GetMapping(params = {"nomePapel", "nomePermissao"})
     @ResponseStatus(value = HttpStatus.OK)
-    public PapelPermissaoRetrievalDTO findPapelPermissao(
-        @Parameter(description = "Os dados que identificam a relação entre papel e permissão.")
-        @Valid PapelPermissaoIdDTO id
-    ) {
+    public PapelPermissaoRetrievalDTO findPapelPermissao(@Valid PapelPermissaoIdDTO id) {
         return this.papelPermissaoMapper.toPapelPermissaoRetrievalDTO(this.papelPermissaoService.findById(id));
     }
 
-    @Operation(summary = "Encontra todas as relações entre papel e permissão.", description = "Encontra todas as relações entre papel e permissão.")
     @GetMapping
     @ResponseStatus(value = HttpStatus.OK)
     public List<PapelPermissaoRetrievalDTO> findPapeisPermissoes() {
